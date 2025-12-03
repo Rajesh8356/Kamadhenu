@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kamadhenu - Cow Farm Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  
+  <style>
+    :root {
+      --primary-green: #032c1a;
+      --dark-green: #032c1a;
+      --light-green: #4caf50;
+      --pastoral-green: #8bc34a;
+      --cream: #fff9e6;
+      --white: #ffffff;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      background-color: var(--cream);
+    }
+    
+    .navbar {
+      background: rgba(10, 92, 54, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 1rem 0;
+      transition: all 0.3s;
+    }
+    
+    .navbar-scrolled {
+      padding: 0.5rem 0;
+      background-color: var(--dark-green) !important;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-family: 'Merriweather', serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--white) !important;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar-brand i {
+      color: var(--white);
+      margin-right: 10px;
+      font-size: 2rem;
+    }/* Language Selector Styles - Add this to your existing CSS */
+
+    /* Language Selector Styles - BOTTOM */
+    .language-selector {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10000;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 25px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        gap: 10px;
+        border: 2px solid #27ae60;
+    }
+
+    .lang-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .lang-btn.english {
+        background: #007bff;
+        color: white;
+    }
+
+    .lang-btn.kannada {
+        background: #ea5c24;
+        color: white;
+    }
+
+    .lang-btn.active {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+    }
+
+    /* Hide Google banner but keep widget */
+    .goog-te-banner-frame { display: none !important; }
+    body { top: 0 !important; }
+
+   
+    .goog-te-gadget {
+        font-size: 12px !important;
+    }
+
+    .goog-te-gadget-simple {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    .goog-te-menu-value span {
+        color: #2c3e50 !important;
+        font-weight: bold !important;
+    }
+
+    /* Sliding Hero Section */
+    .hero-section {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .hero-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .hero-slide.active {
+      opacity: 1;
+    }
+    
+    .hero-slide-1 {
+      background: linear-gradient(rgba(10, 92, 54, 0.7), rgba(6, 64, 39, 0.7)), url('https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80');
+    }
+    
+    .hero-slide-2 {
+      background: linear-gradient(rgba(10, 92, 54, 0.7), rgba(6, 64, 39, 0.7)), url('https://images.unsplash.com/photo-1596733430284-f7437764b1a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80');
+    }
+    
+    .hero-slide-3 {
+      background: linear-gradient(rgba(10, 92, 54, 0.7), rgba(6, 64, 39, 0.7)), url('https://images.unsplash.com/photo-1596733430284-f7437764b1a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80');
+    }
+    
+    .hero-content {
+      color: white;
+      text-align: center;
+      max-width: 800px;
+      padding: 0 20px;
+    }
+    
+    .hero-title {
+      font-family: 'Merriweather', serif;
+      font-weight: 700;
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      color: var(--white);
+      position: relative;
+      display: inline-block;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .hero-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: var(--white);
+      border-radius: 2px;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--white);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      opacity: 0.9;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn-hero {
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary-hero {
+      background: linear-gradient(to right, var(--primary-green), var(--pastoral-green));
+      color: white;
+    }
+    
+    .btn-outline-hero {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+    
+    .btn-hero:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      color: white;
+    }
+    
+    .hero-indicators {
+      position: absolute;
+      bottom: 30px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hero-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .hero-indicator.active {
+      background: white;
+      transform: scale(1.2);
+    }
+    
+    /* About Section Styles */
+    .about-section {
+      padding: 5rem 0;
+      background-color: var(--cream);
+      position: relative;
+    }
+    
+    .section-title {
+      font-family: 'Merriweather', serif;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 3rem;
+      color: var(--primary-green);
+      position: relative;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--primary-green);
+      border-radius: 2px;
+    }
+    
+    .about-content {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 4rem;
+      color: #555;
+    }
+    
+    /* Zigzag Gallery Styles */
+    .zigzag-gallery {
+      padding: 2rem 0;
+      overflow: hidden;
+    }
+    
+    .zigzag-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+      padding: 1rem;
+    }
+    
+    .zigzag-item {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+      opacity: 0;
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    
+    .zigzag-item.left-slide {
+      transform: translateX(-100px);
+    }
+    
+    .zigzag-item.right-slide {
+      transform: translateX(100px);
+    }
+    
+    .zigzag-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .zigzag-item:nth-child(odd) {
+      flex-direction: row;
+    }
+    
+    .zigzag-item:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+    
+    .zigzag-image {
+      flex: 1;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      position: relative;
+      height: 350px;
+    }
+    
+    .zigzag-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .zigzag-image:hover img {
+      transform: scale(1.05);
+    }
+    
+    .zigzag-content {
+      flex: 1;
+      padding: 1rem;
+    }
+    
+    .zigzag-title {
+      font-family: 'Merriweather', serif;
+      font-weight: 700;
+      color: var(--primary-green);
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+    
+    .zigzag-text {
+      color: #555;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+    
+    .scroll-hint {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--primary-green);
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .scroll-hint i {
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+      40% {transform: translateY(-10px);}
+      60% {transform: translateY(-5px);}
+    }
+    
+    .cards-container {
+      padding: 2rem 0 5rem;
+    }
+    
+    .role-card {
+      background: var(--white);
+      border-radius: 20px;
+      border: none;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      height: 100%;
+      position: relative;
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    
+    .role-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(to right, var(--primary-green), var(--pastoral-green));
+    }
+    
+    .role-card:hover {
+      transform: translateY(-15px) rotate(2deg);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-image {
+      height: 200px;
+      overflow: hidden;
+    }
+    
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .role-card:hover .card-image img {
+      transform: scale(1.1);
+    }
+    
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: -40px auto 0;
+      position: relative;
+      z-index: 1;
+      background: var(--white);
+      color: var(--primary-green);
+      border: 5px solid var(--cream);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-icon i {
+      font-size: 2rem;
+    }
+    
+    .role-card .card-title {
+      font-family: 'Merriweather', serif;
+      font-weight: 700;
+      text-align: center;
+      margin: 1.5rem 0 1rem;
+      color: var(--primary-green);
+    }
+    
+    .role-card .card-text {
+      text-align: center;
+      color: #666;
+      padding: 0 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .btn-enter {
+      background: linear-gradient(to right, var(--primary-green), var(--pastoral-green));
+      border: none;
+      border-radius: 50px;
+      padding: 12px 30px;
+      font-weight: 600;
+      color: white;
+      transition: all 0.3s ease;
+      display: block;
+      width: 80%;
+      margin: 0 auto 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-enter:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      color: white;
+    }
+    
+    .footer {
+      background: var(--primary-green);
+      color: white;
+      padding: 3rem 0 2rem;
+      text-align: center;
+    }
+    
+    .footer p {
+      margin-bottom: 0;
+      opacity: 0.8;
+    }
+    
+    .floating-cow {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 4rem;
+      animation: float 6s ease-in-out infinite;
+      z-index: 100;
+      cursor: pointer;
+      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    .cow-speech {
+      position: fixed;
+      bottom: 130px;
+      right: 30px;
+      background: white;
+      padding: 15px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      max-width: 200px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      z-index: 99;
+    }
+    
+    .cow-speech:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      right: 30px;
+      border-width: 10px 10px 0;
+      border-style: solid;
+      border-color: white transparent;
+    }
+    
+    .floating-cow:hover + .cow-speech {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .floating-grass {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10"><path d="M0,10 Q20,0 40,10 Q60,0 80,10 Q100,0 100,10 L0,10 Z" fill="%230a5c36"/></svg>');
+      background-size: 100% 100%;
+    }
+    
+    .floating-leaves {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2rem;
+      color: var(--pastoral-green);
+      animation: leaves 15s linear infinite;
+    }
+    
+    @keyframes leaves {
+      0% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+      100% { transform: translateY(0) rotate(360deg); }
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      background: linear-gradient(rgba(10, 92, 54, 0.9), rgba(6, 64, 39, 0.9)), url('https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1500&q=80');
+      background-size: cover;
+      background-attachment: fixed;
+      color: white;
+      padding: 5rem 0;
+    }
+    
+    .stat-item {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: float 5s ease-in-out infinite;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-text {
+      font-size: 1.1rem;
+    }
+    
+    /* Testimonials */
+    .testimonial-card {
+      border-radius: 15px;
+      overflow: hidden;
+      border: none;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .testimonial-card:hover {
+      transform: translateY(-10px);
+    }
+    
+    .testimonial-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--pastoral-green);
+    }
+    
+    @media (max-width: 992px) {
+      .zigzag-item, .zigzag-item:nth-child(even) {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      .zigzag-image {
+        height: 300px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+        padding: 0 1rem;
+      }
+      
+      .card-icon {
+        width: 70px;
+        height: 70px;
+      }
+      
+      .card-icon i {
+        font-size: 1.7rem;
+      }
+       .language-selector {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 12px;
+    }
+    
+    .lang-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    #google_translate_element {
+        bottom: 70px !important;
+        right: 10px !important;
+        padding: 4px 8px !important;
+    }
+    
+    .floating-cow {
+        bottom: 80px !important; /* Adjust to avoid overlap */
+    }
+    
+    .cow-speech {
+        bottom: 160px !important;
+        right: 20px !important;
+        max-width: 150px;
+    }
+
+      
+      .zigzag-image {
+        height: 250px;
+      }
+      
+      .about-content {
+        padding: 0 1rem;
+      }
+      
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn-hero {
+        width: 200px;
+      }
+    }
+      /* Completely hide ALL Google Translate elements */
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    .goog-te-banner-wrapper,
+    .skiptranslate,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    .goog-tooltip,
+    .goog-tooltip:hover,
+    .goog-text-highlight {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+    }
+    
+    /* Prevent body shift */
+    body {
+        top: 0px !important;
+        position: static !important;
+    }
+    
+    /* Hide the translation menu if it appears */
+    .goog-te-menu-frame {
+        display: none !important;
+    }
+
+/* Replace the existing mobile media query (lines 353-361) with this: */
+@media (max-width: 768px) {
+    #google_translate_element {
+        bottom: 70px !important;  /* Adjust for mobile */
+        right: 10px !important;
+        padding: 4px 8px !important;
+    }
+    
+    .language-selector {
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 10px;
+    }
+    
+    .lang-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
+/* Adjust Google Translate position too */
+#google_translate_element {
+    position: fixed !important;
+    top: 70px !important; /* Adjust this */
+    right: 20px !important;
+    z-index: 9999 !important;
+    background: white !important;
+    padding: 5px 10px !important;
+    border-radius: 5px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    display: block !important;
+}
+
+@media (max-width: 768px) {
+    #google_translate_element {
+        bottom: 70px !important;  /* Adjust for mobile */
+        right: 10px !important;
+    }
+    
+    .language-selector {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 12px;
+    }
+}
+
+  </style>
+</head>
+<body>
+  <div class="floating-leaves">
+    <i class="fas fa-leaf"></i>
+  </div>
+ 
+    <!-- Language Selector -->
+    
+ <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #032c1a;">
+
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-cow"></i>Kamadhenu
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#features">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#testimonials">Testimonials</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-light me-2" href="{{ url_for('farmer') }}">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-warning" href="{{ url_for('farmer') }}">Login</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+
+  <!-- Sliding Hero Section -->
+  <section class="hero-section">
+    <div class="hero-slide hero-slide-1 active">
+      <div class="hero-content">
+        <h1 class="hero-title">Kamadhenu</h1>
+        <p class="hero-subtitle">Modern Cow Farm Management System - Streamlining traditional farming with cutting-edge technology</p>
+        <div class="hero-buttons">
+          <a href="{{ url_for('farmer') }}" class="btn btn-hero btn-primary-hero">Get Started</a>
+          <a href="{{ url_for('farmer') }}" class="btn btn-hero btn-outline-hero">Login</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-slide hero-slide-2">
+      <div class="hero-content">
+        <h1 class="hero-title">Healthy Cattle</h1>
+        <p class="hero-subtitle">Monitor health, track treatments, and ensure the wellbeing of your herd with our comprehensive tools</p>
+        <div class="hero-buttons">
+          <a href="{{ url_for('farmer') }}" class="btn btn-hero btn-primary-hero">Get Started</a>
+          <a href="{{ url_for('farmer') }}" class="btn btn-hero btn-outline-hero">Learn More</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-slide hero-slide-3">
+      <div class="hero-content">
+        <h1 class="hero-title">Smart Farming</h1>
+        <p class="hero-subtitle">Increase productivity and efficiency with data-driven insights and automated farm management</p>
+        <div class="hero-buttons">
+          <a href="{{ url_for('farmer') }}" class="btn btn-hero btn-primary-hero">Get Started</a>
+          <a href="{{ url_for('farmer') }}" class="btn btn-hero btn-outline-hero">See Demo</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-indicators">
+      <div class="hero-indicator active" data-slide="0"></div>
+      <div class="hero-indicator" data-slide="1"></div>
+      <div class="hero-indicator" data-slide="2"></div>
+    </div>
+  </section>
+
+  <!-- About Section with Zigzag Gallery -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <h2 class="section-title">About Kamadhenu</h2>
+      <p class="about-content">
+        Kamadhenu brings together farmers, veterinarians, and farm administrators in a seamless ecosystem designed to 
+        optimize cattle management, health monitoring, and operational efficiency. Our platform combines traditional 
+        farming wisdom with modern technology to create a sustainable future for dairy and cattle farming.
+      </p>
+      
+      <div class="zigzag-gallery">
+        <div class="zigzag-container">
+          <!-- Item 1 -->
+          <div class="zigzag-item left-slide">
+           <!--div class="zigzag-image">
+              <img src="https://images.unsplash.com/photo-1620654458539-b4c186f32a32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Modern Farmers">
+            </div>--> 
+            <div class="zigzag-content">
+              <h3 class="zigzag-title">Modern Farmers</h3>
+              <p class="zigzag-text">
+                Our farmers utilize cutting-edge technology to monitor cattle health, track feeding schedules, 
+                and manage breeding programs. With real-time data at their fingertips, they can make informed 
+                decisions that increase productivity and animal welfare.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Item 2 -->
+          <div class="zigzag-item right-slide">
+            <div class="zigzag-image">
+              <img src="https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Expert Veterinarians">
+            </div>
+            <div class="zigzag-content">
+              <h3 class="zigzag-title">Expert Veterinarians</h3>
+              <p class="zigzag-text">
+                Our network of skilled veterinarians provides comprehensive care with remote monitoring capabilities. 
+                They access health records instantly, provide timely treatments, and prevent disease outbreaks through 
+                proactive health management strategies.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Item 3 -->
+          <div class="zigzag-item left-slide">
+            <div class="zigzag-image">
+              <img src="https://images.unsplash.com/photo-1596733430284-f7437764b1a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Animal Wellness">
+            </div>
+            <div class="zigzag-content">
+              <h3 class="zigzag-title">Animal Wellness</h3>
+              <p class="zigzag-text">
+                We prioritize cattle health and happiness with continuous monitoring systems that track vital signs, 
+                activity levels, and feeding patterns. Early detection of health issues leads to quicker interventions 
+                and better outcomes for our animals.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Item 4 -->
+          <div class="zigzag-item right-slide">
+            <div class="zigzag-image">
+              <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Sustainable Practices">
+            </div>
+            <div class="zigzag-content">
+              <h3 class="zigzag-title">Sustainable Practices</h3>
+              <p class="zigzag-text">
+                Kamadhenu promotes environmentally responsible farming through waste management solutions, 
+                renewable energy integration, and sustainable grazing practices. We're committed to preserving 
+                our planet for future generations.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="scroll-hint">
+          <i class="fas fa-arrow-down"></i>
+          <span>Scroll to see more</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-3 col-6">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-cow"></i>
+            </div>
+            <h2 class="stat-number">5,000+</h2>
+            <p class="stat-text">Cows Managed</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h2 class="stat-number">250+</h2>
+            <p class="stat-text">Happy Farmers</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-glass-milk"></i>
+            </div>
+            <h2 class="stat-number">1.2M L</h2>
+            <p class="stat-text">Milk Tracked</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-map-marked"></i>
+            </div>
+            <h2 class="stat-number">15</h2>
+            <p class="stat-text">Countries</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="cards-container">
+    <div class="container">
+      <h2 class="section-title">Portal Access</h2>
+      <div class="row g-4 justify-content-center">
+        <!-- Admin Card -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card role-card">
+            <div class="card-image">
+              <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Admin Portal">
+            </div>
+            <div class="card-icon">
+              <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">Admin</h3>
+              <p class="card-text">Manage the entire system, oversee operations, and monitor farm performance with comprehensive administrative tools.</p>
+              <a href="{{ url_for('admin_login') }}" class="btn btn-enter">Enter Portal</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Farmer Card -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card role-card">
+            <div class="card-image">
+              <img src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1174&q=80" alt="Farmer Portal">
+            </div>
+            <div class="card-icon">
+              <i class="fas fa-tractor"></i>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">Farmer</h3>
+              <p class="card-text">Manage your cows, track daily activities, monitor health records, and optimize your farm's productivity.</p>
+              <a href="{{ url_for('farmer') }}" class="btn btn-enter">Enter Portal</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Veterinarian Card -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card role-card">
+            <div class="card-image">
+              <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80" alt="Veterinarian Portal">
+            </div>
+            <div class="card-icon">
+              <i class="fas fa-stethoscope"></i>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">Veterinarian</h3>
+              <p class="card-text">Monitor cow health, provide treatments, track medical history, and ensure the wellbeing of all farm animals.</p>
+              <a href="{{ url_for('veterinarian') }}" class="btn btn-enter">Enter Portal</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="py-5 bg-light">
+    <div class="container py-5">
+      <h2 class="section-title">What Farmers Say</h2>
+      <p class="about-content">Real stories from our community</p>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card testimonial-card h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Farmer" class="testimonial-img me-3">
+                <div>
+                  <h5 class="fw-bold mb-0">Rajesh Kumar</h5>
+                  <small class="text-muted">Dairy Farmer</small>
+                </div>
+              </div>
+              <p class="mb-0">"Kamadhenu has transformed how I manage my dairy. I've increased milk production by 22% while reducing costs."</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card testimonial-card h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Farmer" class="testimonial-img me-3">
+                <div>
+                  <h5 class="fw-bold mb-0">Priya Sharma</h5>
+                  <small class="text-muted">Cattle Breeder</small>
+                </div>
+              </div>
+              <p class="mb-0">"The health monitoring features helped me detect illness early and save three of my best cows. Incredible tool!"</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card testimonial-card h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <img src="https://randomuser.me/api/portraits/men/62.jpg" alt="Farmer" class="testimonial-img me-3">
+                <div>
+                  <h5 class="fw-bold mb-0">Vikram Singh</h5>
+                  <small class="text-muted">Organic Farm Owner</small>
+                </div>
+              </div>
+              <p class="mb-0">"The analytics helped me optimize feeding schedules and breed selection. My farm's productivity has never been better!"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-5 bg-success text-white">
+    <div class="container py-5 text-center">
+      <h2 class="fw-bold mb-3">Ready to Transform Your Farm Management?</h2>
+      <p class="lead mb-4">Join thousands of farmers using Kamadhenu to optimize their operations</p>
+      <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg px-5 py-3 me-3">Start Free Trial</a>
+      <a href="{{ url_for('login') }}" class="btn btn-light btn-lg px-5 py-3">Schedule Demo</a>
+    </div>
+  </section>
+
+  <div class="floating-cow">🐄</div>
+  <div class="cow-speech">
+    Welcome to Kamadhenu! How can I help you today?
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2023 Kamadhenu Cow Farm Management System | Bringing Technology to Traditional Farming</p>
+    </div>
+  </footer>
+ <!-- ADD THESE HERE (just before closing body) -->
+  <!-- Google Translate Widget
+  <div id="google_translate_element"></div> -->
+
+  <!-- Language Selector Buttons -->
+  <div class="language-selector">
+    <button class="lang-btn english active" onclick="setLanguage('en')">
+        <i class="fas fa-globe-americas"></i> English
+    </button>
+    <button class="lang-btn kannada" onclick="setLanguage('kn')">
+        <i class="fas fa-globe-asia"></i> ಕನ್ನಡ
+    </button>
+  </div>
+  <!-- Add this after the language selector -->
+<div id="google_translate_element"></div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ============================================
+    // LANGUAGE MANAGEMENT SYSTEM
+    // ============================================
+    
+    // 1. Function to save language preference
+    function saveLanguagePreference(lang) {
+        // Save to localStorage (browser storage)
+        localStorage.setItem('selectedLanguage', lang);
+        
+        // Save to cookies (for server-side access if needed)
+        document.cookie = `user_language=${lang}; path=/; max-age=31536000`; // 1 year
+        
+        // Save to sessionStorage (for current session)
+        sessionStorage.setItem('selectedLanguage', lang);
+    }
+    
+    // 2. Function to apply language translation
+    function applyLanguage(lang) {
+        if (lang === 'kn') {
+            // Kannada translation
+            window.location.hash = '#googtrans(kn|en)';
+            
+            // Force Google Translate to apply
+            setTimeout(function() {
+                if (window.google && google.translate && google.translate.TranslateElement) {
+                    try {
+                        // This triggers the translation
+                        var select = document.querySelector('.goog-te-combo');
+                        if (select) {
+                            select.value = 'kn';
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    } catch(e) {
+                        console.log('Translation applied');
+                    }
+                }
+            }, 500);
+        } else {
+            // English (default)
+            window.location.hash = '#googtrans(en)';
+            
+            setTimeout(function() {
+                if (window.google && google.translate && google.translate.TranslateElement) {
+                    try {
+                        var select = document.querySelector('.goog-te-combo');
+                        if (select) {
+                            select.value = 'en';
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    } catch(e) {
+                        console.log('English applied');
+                    }
+                }
+            }, 500);
+        }
+    }
+    
+    // 3. Main language switching function (called when buttons are clicked)
+    function setLanguage(lang) {
+        // Update button UI
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Save the preference
+        saveLanguagePreference(lang);
+        
+        // Apply immediately
+        applyLanguage(lang);
+        
+        // Show confirmation (optional)
+        if (lang === 'kn') {
+            alert('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
+        } else {
+            alert('Language changed to English');
+        }
+    }
+    
+    // 4. Initialize Google Translate
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,kn',
+            layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+            autoDisplay: false,  // Don't auto-display banner
+            disableAutoTranslation: false
+        }, 'google_translate_element');
+        
+        // Hide the Google Translate widget immediately
+        setTimeout(function() {
+            // Hide all Google Translate elements
+            var elements = document.querySelectorAll('.goog-te-banner, .skiptranslate, .goog-te-gadget');
+            elements.forEach(function(el) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.height = '0';
+                el.style.overflow = 'hidden';
+            });
+            
+            // Fix body position
+            document.body.style.top = '0';
+        }, 100);
+    }
+    
+    // 5. Load Google Translate script
+    function loadGoogleTranslate() {
+        // Check if already loaded
+        if (window.google && google.translate) {
+            googleTranslateElementInit();
+            return;
+        }
+        
+        // Load the script
+        var script = document.createElement('script');
+        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        script.type = 'text/javascript';
+        document.head.appendChild(script);
+    }
+    
+    // 6. On page load - MAIN FUNCTION
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load Google Translate
+        loadGoogleTranslate();
+        
+        // Check for saved language preference
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        
+        // Set active button
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if ((savedLang === 'en' && btn.classList.contains('english')) || 
+                (savedLang === 'kn' && btn.classList.contains('kannada'))) {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Apply saved language after a short delay (wait for Google Translate to load)
+        setTimeout(function() {
+            applyLanguage(savedLang);
+        }, 1000);
+        
+        // ============================================
+        // ADD THIS: Add language parameter to all links
+        // ============================================
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !href.includes('#') && href !== '#') {
+                // Add language parameter to the link
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                const separator = href.includes('?') ? '&' : '?';
+                link.href = href + separator + 'lang=' + lang;
+            }
+        });
+    });
+
+    // ============================================
+    // YOUR EXISTING ANIMATION CODE
+    // ============================================
+    
+    // Hero Slider Functionality
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicators = document.querySelectorAll('.hero-indicator');
+    const slideCount = slides.length;
+    
+    function showSlide(index) {
+      slides.forEach(slide => slide.classList.remove('active'));
+      indicators.forEach(indicator => indicator.classList.remove('active'));
+      
+      slides[index].classList.add('active');
+      indicators[index].classList.add('active');
+      currentSlide = index;
+    }
+    
+    // Auto slide every 5 seconds
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slideCount;
+      showSlide(currentSlide);
+    }, 5000);
+    
+    // Add click event to indicators
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => {
+        showSlide(index);
+      });
+    });
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('navbar-scrolled');
+      } else {
+        navbar.classList.remove('navbar-scrolled');
+      }
+    });
+    
+    // Create floating leaves
+    function createLeaves() {
+      const leavesContainer = document.querySelector('.floating-leaves');
+      const leafIcons = ['fas fa-leaf', 'fas fa-seedling', 'fab fa-pagelines'];
+      const colors = ['#4caf50', '#8bc34a', '#689f38'];
+      
+      for (let i = 0; i < 8; i++) {
+        const leaf = document.createElement('div');
+        leaf.innerHTML = `<i class="${leafIcons[i % 3]}" style="color: ${colors[i % 3]}"></i>`;
+        leaf.style.position = 'absolute';
+        leaf.style.fontSize = Math.random() * 1.5 + 1 + 'rem';
+        leaf.style.left = Math.random() * 100 + 'vw';
+        leaf.style.top = Math.random() * 100 + 'vh';
+        leaf.style.opacity = Math.random() * 0.5 + 0.3;
+        leaf.style.animation = `leaves ${Math.random() * 10 + 10}s linear infinite`;
+        leaf.style.animationDelay = Math.random() * 5 + 's';
+        document.body.appendChild(leaf);
+      }
+    }
+    
+    // Create floating leaves on load
+    window.addEventListener('load', createLeaves);
+    
+    // Make cow speech bubble appear randomly
+    setInterval(() => {
+      const speech = document.querySelector('.cow-speech');
+      speech.style.opacity = '1';
+      speech.style.transform = 'translateY(0)';
+      
+      setTimeout(() => {
+        speech.style.opacity = '0';
+        speech.style.transform = 'translateY(20px)';
+      }, 5000);
+    }, 15000);
+    
+    // Animation on scroll
+    function checkVisibility() {
+        const zigzagItems = document.querySelectorAll('.zigzag-item');
+        const roleCards = document.querySelectorAll('.role-card');
+        
+        // Zigzag items animation
+        zigzagItems.forEach(item => {
+          const position = item.getBoundingClientRect();
+          if(position.top < window.innerHeight - 100) {
+            item.classList.add('visible');
+          }
+        });
+        
+        // Role cards animation
+        roleCards.forEach(card => {
+          const position = card.getBoundingClientRect();
+          if(position.top < window.innerHeight - 100) {
+            card.classList.add('visible');
+          }
+        });
+    }
+    
+    // Check on load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkVisibility();
+        window.addEventListener('scroll', checkVisibility);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sale History - Kamadhenu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #043c07;
+      --secondary: #ffc107;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --light-green: #e8f5e9;
+    }
+    
+    body {
+      background-color: #f5f9f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .dashboard-container {
+      width: 100%;
+      margin: 0;
+    }
+
+    .sidebar {
+      background: linear-gradient(to bottom, var(--primary), #1b5e20);
+      color: white;
+      height: 100vh;
+      position: fixed;
+      width: 260px;
+      padding-top: 20px;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+    }
+    
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+    
+    .header {
+      background-color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .welcome-text {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+      margin-bottom: 20px;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .cow-icon {
+      background-color: var(--light-green);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+    }
+    
+    .cow-icon i {
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+    
+    .logo {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 30px;
+    }
+    
+    .nav-item {
+      margin: 10px 0;
+    }
+    
+    .nav-link {
+      color: rgba(255,255,255,0.8);
+      padding: 8px 16px;
+      border-radius: 5px;
+      margin: 5px 15px;
+      transition: all 0.3s;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+    }
+    
+    .nav-link i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .cow-background {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%232e7d32" fill-opacity="0.05" d="M50,10A40,40 0 1,1 50,90A40,40 0 1,1 50,10z M30,30 Q50,15 70,30 Q65,50 70,70 Q50,85 30,70 Q35,50 30,30 z"></path></svg>');
+      background-repeat: repeat;
+      background-size: 200px;
+    }
+    
+    /* Submenu styles */
+    .submenu {
+      list-style: none;
+      padding-left: 30px;
+      display: none;
+    }
+    
+    .submenu .nav-link {
+      font-size: 14px;
+      padding: 6px 14px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .submenu .nav-link:hover {
+      color: #fff;
+    }
+    
+    .sold-badge {
+      background-color: var(--secondary);
+      color: var(--dark);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .for-sale-badge {
+      background-color: #28a745;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .pending-badge {
+      background-color: #17a2b8;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+    }
+     /* Language Selector Styles - BOTTOM */
+    .language-selector {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10000;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 25px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        gap: 10px;
+        border: 2px solid #27ae60;
+    }
+
+    .lang-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .lang-btn.english {
+        background: #007bff;
+        color: white;
+    }
+
+    .lang-btn.kannada {
+        background: #ff9800;
+        color: white;
+    }
+
+    .lang-btn.active {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+    }
+
+    /* Hide Google banner */
+    .goog-te-banner-frame { display: none !important; }
+    body { top: 0 !important; }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .language-selector {
+            bottom: 10px;
+            right: 10px;
+            padding: 6px 10px;
+        }
+        
+        .lang-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+    }
+    /* Completely hide ALL Google Translate elements */
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    .goog-te-banner-wrapper,
+    .skiptranslate,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    .goog-tooltip,
+    .goog-tooltip:hover,
+    .goog-text-highlight {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+    }
+    
+    /* Prevent body shift */
+    body {
+        top: 0px !important;
+        position: static !important;
+    }
+    
+    /* Hide the translation menu if it appears */
+    .goog-te-menu-frame {
+        display: none !important;
+    }
+  </style>
+</head>
+<body class="cow-background">
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <h2><i class="fas fa-cow"></i> Kamadhenu</h2>
+        <p class="mb-0">Cow Management System</p>
+      </div>
+      
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/dashboard">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/add_cow">
+            <i class="fas fa-plus-circle"></i> Add New Cow
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cows">
+            <i class="fas fa-list"></i> View My Cows
+          </a>
+        </li>
+          <li class="nav-item">
+        <a class="nav-link" href="/find_cow">
+          <i class="fas fa-search"></i> Find Cow
+        </a>
+      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/milk_yield">
+            <i class="fas fa-tint"></i> Milk Yield
+          </a>
+        </li>
+           <li class="nav-item">
+                    <a class="nav-link " href="/disease_prediction">
+                        <i class="fas fa-stethoscope"></i> Disease Detection
+                    </a>
+                </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/book_appointment">
+            <i class="fas fa-syringe"></i> Book Appointment
+          </a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('farmer_treatments') }}">
+            <i class="fas fa-syringe"></i> Treatment History
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('add_geotag') }}">
+            <i class="fas fa-map-marker-alt"></i> Add Geo Tag
+          </a>
+        </li>
+        <li class="nav-item">
+  <a class="nav-link" href="{{ url_for('analytics') }}">
+   <i class="fas fa-chart-bar"></i> Analytics
+  </a>
+</li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+            <i class="fas fa-chart-line"></i> Market Place <i class="fas fa-caret-down float-end"></i>
+          </a>
+          <ul class="submenu">
+            <li><a class="nav-link" href="/buy_cow"><i class="fas fa-shopping-cart"></i> Buy Cows</a></li>
+            <li><a class="nav-link" href="/sell_cow"><i class="fas fa-hand-holding-usd"></i> Sell Cows</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/sold_cows">
+            <i class="fas fa-check-circle"></i> Sale History
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <div>
+          <h2 class="welcome-text">Sale History</h2>
+          <p class="mb-0 text-muted">Your listed cows and their sale status</p>
+        </div>
+        <a href="/farmer/logout" class="btn btn-danger">Logout</a>
+      </div>
+
+      <!-- Flash Messages -->
+     
+
+      <div class="row">
+        {% if cows %}
+          {% for cow in cows %}
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <div class="card-body text-center">
+                {% if cow.photo %}
+                  <img src="{{ url_for('static', filename='uploads/cow/' + cow.photo) }}" 
+                       class="img-fluid rounded mb-3" 
+                       style="height:150px; width:100%; object-fit:cover;"
+                       alt="{{ cow.breed }}">
+                {% else %}
+                  <div class="cow-icon mb-3">
+                    <i class="fas fa-cow"></i>
+                  </div>
+                {% endif %}
+                
+                <!-- Dynamic Badge based on status -->
+                {% if cow.status == 'SOLD' %}
+                  <span class="sold-badge mb-2"><i class="fas fa-check-circle"></i> SOLD</span>
+                {% else %}
+                  <span class="for-sale-badge mb-2"><i class="fas fa-tag"></i> FOR SALE</span>
+                {% endif %}
+                
+                <h5 class="card-title text-primary">{{ cow.breed }}</h5>
+                <p class="card-text mb-1"><strong>ID:</strong> {{ cow.cow_id }}</p>
+                <p class="card-text mb-1"><strong>Age:</strong> {{ cow.age }} Months</p>
+                <p class="card-text mb-1"><strong>Weight:</strong> {{ cow.weight }} kg</p>
+                <p class="card-text mb-1"><strong>Price:</strong> ₹{{ cow.price }}</p>
+                
+                {% if cow.status == 'SOLD' %}
+                  <p class="card-text mb-0 text-success">
+                    <small><strong><i class="fas fa-calendar-check"></i> Sold On:</strong> {{ cow.listed_at[:10] }}</small>
+                  </p>
+                {% else %}
+                  <p class="card-text mb-0 text-info">
+                    <small><strong><i class="fas fa-calendar-plus"></i> Listed On:</strong> {{ cow.listed_at[:10] }}</small>
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body text-center py-5">
+                <div class="cow-icon mb-3">
+                  <i class="fas fa-cow"></i>
+                </div>
+                <h4 class="text-muted">No Cows Listed for Sale</h4>
+                <p class="text-muted mb-3">You haven't listed any cows for sale yet.</p>
+                <a href="/sell_cow" class="btn btn-primary">
+                  <i class="fas fa-hand-holding-usd"></i> List a Cow for Sale
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleSubmenu(event) {
+      event.preventDefault();
+      const submenu = event.target.closest("li").querySelector(".submenu");
+      submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+    }
+
+    // Simple animation for cards on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.5s ease';
+          card.style.opacity = 1;
+          card.style.transform = 'translateY(0)';
+        }, 100 * index);
+      });
+    });
+  </script>
+  <script>
+    // Language translation functions
+    function googleTranslateElementInit() {
+        if (typeof google !== 'undefined' && google.translate) {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,kn',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            const savedLang = localStorage.getItem('selectedLanguage');
+            if(savedLang === 'kn') {
+                setTimeout(() => applyKannada(), 1000);
+            }
+        }
+    }
+
+    window.onload = function() {
+        if (typeof google !== 'undefined' && google.translate) {
+            googleTranslateElementInit();
+        } else {
+            var script = document.createElement('script');
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            document.body.appendChild(script);
+        }
+        
+        const savedLang = localStorage.getItem('selectedLanguage');
+        if(savedLang === 'kn') {
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.lang-btn.kannada').classList.add('active');
+            setTimeout(() => applyKannada(), 2000);
+        }
+    };
+
+    function applyKannada() {
+        var iframe = document.querySelector('.goog-te-menu-frame');
+        if(iframe && iframe.contentDocument) {
+            var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
+            if(select) {
+                select.value = 'kn';
+                select.dispatchEvent(new Event('change'));
+                return true;
+            }
+        }
+        
+        var elements = document.querySelectorAll('.goog-te-menu2-select');
+        if(elements.length > 0) {
+            elements[0].value = 'kn';
+            elements[0].dispatchEvent(new Event('change'));
+            return true;
+        }
+        
+        return false;
+    }
+
+    function setLanguage(lang) {
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        localStorage.setItem('selectedLanguage', lang);
+        
+        if(lang === 'kn') {
+            window.location.hash = '#googtrans(kn)';
+            if(applyKannada()) {
+                console.log('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
+            } else {
+                setTimeout(() => location.reload(), 500);
+            }
+        } else {
+            window.location.hash = '#googtrans(en)';
+            var iframe = document.querySelector('.goog-te-menu-frame');
+            if(iframe && iframe.contentDocument) {
+                var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
+                if(select) {
+                    select.value = 'en';
+                    select.dispatchEvent(new Event('change'));
+                    console.log('Language changed to English');
+                    return;
+                }
+            }
+            setTimeout(() => location.reload(), 500);
+        }
+    }
+</script>
+</body>
+</html>

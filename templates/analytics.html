@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - Kamadhenu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #043c07;
+      --secondary: #ffc107;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --light-green: #e8f5e9;
+    }
+
+    body { 
+      background-color: #f5f9f5; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      overflow-x: hidden;
+    }
+
+    .analytics-container { width: 100%; margin: 0; }
+
+    .sidebar {
+      background: linear-gradient(to bottom, var(--primary), #1b5e20);
+      color: white;
+      height: 100vh;
+      position: fixed;
+      width: 260px;
+      padding-top: 20px;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .main-content { 
+      margin-left: 260px; 
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .header {
+      background-color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stats-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      text-align: center;
+      margin-bottom: 20px;
+      transition: transform 0.3s;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .stats-number { font-size: 2rem; font-weight: bold; color: var(--primary); }
+    .stats-label { color: #666; font-size: 0.9rem; }
+
+    .chart-container {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      height: 400px;
+    }
+
+    .chart-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 20px;
+      text-align: center;
+      border-bottom: 2px solid var(--light-green);
+      padding-bottom: 10px;
+    }
+
+    .logo { text-align: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 30px; }
+
+    .nav-item { margin: 10px 0; }
+    .nav-link {
+      color: rgba(255,255,255,0.8);
+      padding: 8px 16px;
+      border-radius: 5px;
+      margin: 5px 15px;
+      transition: all 0.3s;
+    }
+    .nav-link:hover, .nav-link.active { background-color: rgba(255,255,255,0.1); color: white; }
+    .nav-link i { margin-right: 10px; width: 20px; text-align: center; }
+
+    .back-btn {
+      background-color: var(--secondary);
+      color: var(--dark);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .back-btn:hover { background-color: #e0a800; transform: translateY(-2px); color: var(--dark); }
+
+    .no-data { 
+      text-align: center; 
+      padding: 50px 20px; 
+      color: #666;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .no-data i { font-size: 3rem; margin-bottom: 15px; color: #ccc; }
+
+    /* Chart specific styling */
+    .chart-wrapper {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    .date-filter {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .submenu {
+      list-style: none;
+      padding-left: 30px;
+      display: none;
+    }
+    
+    .submenu .nav-link {
+      font-size: 14px;
+      padding: 6px 14px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .submenu .nav-link:hover {
+      color: #fff;
+    }
+
+    /* Mobile menu toggle button */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Overlay for mobile when sidebar is open */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    
+    .overlay.active {
+      display: block;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: 70%;
+        max-width: 250px;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .header {
+        padding: 15px 15px 15px 50px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .chart-container {
+        padding: 15px;
+        height: 350px;
+      }
+      
+      .date-filter {
+        padding: 15px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .main-content {
+        padding: 10px;
+      }
+      
+      .chart-container {
+        height: 300px;
+      }
+      
+      .logo h2 {
+        font-size: 1.5rem;
+      }
+      
+      .stats-number {
+        font-size: 1.7rem;
+      }
+      
+      .chart-title {
+        font-size: 1rem;
+      }
+    }
+     /* Language Selector Styles - BOTTOM */
+    .language-selector {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10000;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 25px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        gap: 10px;
+        border: 2px solid #27ae60;
+    }
+
+    .lang-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .lang-btn.english {
+        background: #007bff;
+        color: white;
+    }
+
+    .lang-btn.kannada {
+        background: #ff9800;
+        color: white;
+    }
+
+    .lang-btn.active {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+    }
+
+    /* Hide Google banner */
+    .goog-te-banner-frame { display: none !important; }
+    body { top: 0 !important; }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .language-selector {
+            bottom: 10px;
+            right: 10px;
+            padding: 6px 10px;
+        }
+        
+        .lang-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+    }
+    /* Completely hide ALL Google Translate elements */
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    .goog-te-banner-wrapper,
+    .skiptranslate,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    .goog-tooltip,
+    .goog-tooltip:hover,
+    .goog-text-highlight {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+    }
+    
+    /* Prevent body shift */
+    body {
+        top: 0px !important;
+        position: static !important;
+    }
+    
+    /* Hide the translation menu if it appears */
+    .goog-te-menu-frame {
+        display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Mobile menu toggle -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay"></div>
+
+  <div class="analytics-container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="logo">
+        <h2><i class="fas fa-cow"></i> Kamadhenu</h2>
+        <p class="mb-0">Cow Management System</p>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/dashboard">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/add_cow">
+            <i class="fas fa-plus-circle"></i> Add New Cow
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cows">
+            <i class="fas fa-list"></i> View My Cows
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/find_cow">
+            <i class="fas fa-search"></i> Find Cow
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/milk_yield">
+            <i class="fas fa-tint"></i> Milk Yield
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/disease_prediction">
+              <i class="fas fa-stethoscope"></i> Disease Detection
+          </a>
+      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/book_appointment">
+            <i class="fas fa-syringe"></i> Book Appointment
+          </a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('farmer_treatments') }}">
+            <i class="fas fa-syringe"></i> Treatment History
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('add_geotag') }}">
+            <i class="fas fa-map-marker-alt"></i> Add Geo Tag
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{{ url_for('analytics') }}">
+            <i class="fas fa-chart-bar"></i> Analytics
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+            <i class="fas fa-exchange-alt"></i> Market Place <i class="fas fa-caret-down float-end"></i>
+          </a>
+          <ul class="submenu">
+            <li><a class="nav-link" href="/buy_cow"><i class="fas fa-shopping-cart"></i> Buy Cows</a></li>
+            <li><a class="nav-link" href="/sell_cow"><i class="fas fa-hand-holding-usd"></i> Sell Cows</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/sold_cows">
+            <i class="fas fa-check-circle"></i> Sale History
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <div class="header">
+        <div>
+          <h2 style="color: var(--primary);">Farm Analytics</h2>
+          <p class="mb-0 text-muted">Daily insights about your farm performance</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+      </div>
+
+      <!-- Date Filter -->
+      <div class="date-filter">
+        <form method="GET" class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label fw-bold">From Date</label>
+            <input type="date" name="start_date" class="form-control" value="{{ start_date or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">To Date</label>
+            <input type="date" name="end_date" class="form-control" value="{{ end_date or '' }}">
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-filter me-1"></i> Filter
+            </button>
+          </div>
+          <div class="col-md-2">
+            <a href="{{ url_for('analytics') }}" class="btn btn-secondary w-100">
+              <i class="fas fa-times me-1"></i> Clear
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="row">
+        <div class="col-md-4">
+          <div class="stats-card">
+            <div class="stats-number">{{ "%.1f"|format(current_milk) }} L</div>
+            <div class="stats-label">Today's Milk Production</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-card">
+            <div class="stats-number">{{ current_sales }}</div>
+            <div class="stats-label">Cows Sold (This Month)</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-card">
+            <div class="stats-number">{{ total_cows or 0 }}</div>
+            <div class="stats-label">Total Cows</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="chart-container">
+            <div class="chart-title">Daily Milk Production</div>
+            <div class="chart-wrapper">
+              {% if daily_milk %}
+              <canvas id="milkChart"></canvas>
+              {% else %}
+              <div class="no-data">
+                <i class="fas fa-chart-line"></i>
+                <p>No milk production data available</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="chart-container">
+            <div class="chart-title">Daily Cow Registration</div>
+            <div class="chart-wrapper">
+              {% if daily_cows %}
+              <canvas id="cowsChart"></canvas>
+              {% else %}
+              <div class="no-data">
+                <i class="fas fa-chart-bar"></i>
+                <p>No cow registration data available</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="chart-container">
+            <div class="chart-title">Daily Sales Activity</div>
+            <div class="chart-wrapper">
+              {% if daily_sales %}
+              <canvas id="salesChart"></canvas>
+              {% else %}
+              <div class="no-data">
+                <i class="fas fa-shopping-cart"></i>
+                <p>No sales data available</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="chart-container">
+            <div class="chart-title">Breed Distribution</div>
+            <div class="chart-wrapper">
+              {% if breed_data %}
+              <canvas id="breedChart"></canvas>
+              {% else %}
+              <div class="no-data">
+                <i class="fas fa-cow"></i>
+                <p>No breed distribution data available</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Toggle mobile sidebar
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const overlay = document.getElementById('overlay');
+    
+    menuToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      
+      // Change icon based on sidebar state
+      const icon = menuToggle.querySelector('i');
+      if (sidebar.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      }
+    });
+    
+    // Close sidebar when clicking on overlay
+    overlay.addEventListener('click', function() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      const icon = menuToggle.querySelector('i');
+      icon.classList.remove('fa-times');
+      icon.classList.add('fa-bars');
+    });
+    
+    // Close sidebar when clicking on a nav link (mobile)
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          const icon = menuToggle.querySelector('i');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+    });
+
+    // Toggle submenu function
+    function toggleSubmenu(event) {
+      event.preventDefault();
+      const submenu = event.target.closest("li").querySelector(".submenu");
+      submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+    }
+
+    // Daily Milk Chart - Line Chart
+    {% if daily_milk %}
+    try {
+      const milkCtx = document.getElementById('milkChart').getContext('2d');
+      const milkChart = new Chart(milkCtx, {
+        type: 'line',
+        data: {
+          labels: {{ daily_milk | map(attribute='date') | list | tojson }},
+          datasets: [{
+            label: 'Milk Production (L)',
+            data: {{ daily_milk | map(attribute='total_milk') | list | tojson }},
+            backgroundColor: 'rgba(4, 60, 7, 0.1)',
+            borderColor: '#043c07',
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#043c07',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Milk: ${context.parsed.y}L`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Dates',
+                color: '#666',
+                font: {
+                  weight: 'bold',
+                  size: 12
+                }
+              },
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#666',
+                maxTicksLimit: 10
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Liters of Milk',
+                color: '#666',
+                font: {
+                  weight: 'bold',
+                  size: 12
+                }
+              },
+              beginAtZero: true,
+              ticks: {
+                color: '#666',
+                callback: function(value) {
+                  return value + 'L';
+                }
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.05)'
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Milk chart error:', error);
+    }
+    {% endif %}
+
+    // Daily Cow Registration Chart - Bar Chart
+    {% if daily_cows %}
+    try {
+      const cowsCtx = document.getElementById('cowsChart').getContext('2d');
+      const cowsChart = new Chart(cowsCtx, {
+        type: 'bar',
+        data: {
+          labels: {{ daily_cows | map(attribute='date') | list | tojson }},
+          datasets: [{
+            label: 'Cows Registered',
+            data: {{ daily_cows | map(attribute='count') | list | tojson }},
+            backgroundColor: 'rgba(4, 60, 7, 0.7)',
+            borderColor: '#043c07',
+            borderWidth: 2,
+            borderRadius: 3,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Cows: ${context.parsed.y}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Dates',
+                color: '#666',
+                font: {
+                  weight: 'bold',
+                  size: 12
+                }
+              },
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#666',
+                maxTicksLimit: 8
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Number of Cows',
+                color: '#666',
+                font: {
+                  weight: 'bold',
+                  size: 12
+                }
+              },
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                color: '#666',
+                callback: function(value) {
+                  return value + ' cows';
+                }
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.05)'
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Cows chart error:', error);
+    }
+    {% endif %}
+
+    // Daily Sales Chart - Bar Chart
+    {% if daily_sales %}
+    try {
+      const salesCtx = document.getElementById('salesChart').getContext('2d');
+      const salesChart = new Chart(salesCtx, {
+        type: 'bar',
+        data: {
+          labels: {{ daily_sales | map(attribute='date') | list | tojson }},
+          datasets: [{
+            label: 'Cows Sold',
+            data: {{ daily_sales | map(attribute='sold_count') | list | tojson }},
+            backgroundColor: 'rgba(40, 167, 69, 0.7)',
+            borderColor: '#28a745',
+            borderWidth: 2,
+            borderRadius: 3,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Sold: ${context.parsed.y} cows`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Dates',
+                color: '#666',
+                font: {
+                  weight: 'bold',
+                  size: 12
+                }
+              },
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#666',
+                maxTicksLimit: 8
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Number of Cows',
+                color: '#666',
+                font: {
+                  weight: 'bold',
+                  size: 12
+                }
+              },
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                color: '#666',
+                callback: function(value) {
+                  return value + ' cows';
+                }
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.05)'
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Sales chart error:', error);
+    }
+    {% endif %}
+
+    // Breed Distribution Chart - Doughnut
+    {% if breed_data %}
+    try {
+      const breedCtx = document.getElementById('breedChart').getContext('2d');
+      const breedChart = new Chart(breedCtx, {
+        type: 'doughnut',
+        data: {
+          labels: {{ breed_data | map(attribute='breed') | list | tojson }},
+          datasets: [{
+            data: {{ breed_data | map(attribute='count') | list | tojson }},
+            backgroundColor: [
+              '#043c07', '#28a745', '#20c997', '#007bff', '#6f42c1',
+              '#e83e8c', '#fd7e14', '#ffc107', '#6610f2', '#6c757d'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                boxWidth: 12,
+                padding: 15,
+                generateLabels: function(chart) {
+                  const data = chart.data;
+                  if (data.labels.length && data.datasets.length) {
+                    return data.labels.map((label, i) => {
+                      const value = data.datasets[0].data[i];
+                      return {
+                        text: `${label} (${value})`,
+                        fillStyle: data.datasets[0].backgroundColor[i],
+                        strokeStyle: data.datasets[0].borderColor,
+                        lineWidth: data.datasets[0].borderWidth,
+                        hidden: false,
+                        index: i
+                      };
+                    });
+                  }
+                  return [];
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = Math.round((value / total) * 100);
+                  return `${label}: ${value} cows (${percentage}%)`;
+                }
+              }
+            }
+          },
+          cutout: '60%'
+        }
+      });
+    } catch (error) {
+      console.error('Breed chart error:', error);
+    }
+    {% endif %}
+  </script>
+  <script>
+    // Language translation functions
+    function googleTranslateElementInit() {
+        if (typeof google !== 'undefined' && google.translate) {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,kn',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            const savedLang = localStorage.getItem('selectedLanguage');
+            if(savedLang === 'kn') {
+                setTimeout(() => applyKannada(), 1000);
+            }
+        }
+    }
+
+    window.onload = function() {
+        if (typeof google !== 'undefined' && google.translate) {
+            googleTranslateElementInit();
+        } else {
+            var script = document.createElement('script');
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            document.body.appendChild(script);
+        }
+        
+        const savedLang = localStorage.getItem('selectedLanguage');
+        if(savedLang === 'kn') {
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.lang-btn.kannada').classList.add('active');
+            setTimeout(() => applyKannada(), 2000);
+        }
+    };
+
+    function applyKannada() {
+        var iframe = document.querySelector('.goog-te-menu-frame');
+        if(iframe && iframe.contentDocument) {
+            var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
+            if(select) {
+                select.value = 'kn';
+                select.dispatchEvent(new Event('change'));
+                return true;
+            }
+        }
+        
+        var elements = document.querySelectorAll('.goog-te-menu2-select');
+        if(elements.length > 0) {
+            elements[0].value = 'kn';
+            elements[0].dispatchEvent(new Event('change'));
+            return true;
+        }
+        
+        return false;
+    }
+
+    function setLanguage(lang) {
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        localStorage.setItem('selectedLanguage', lang);
+        
+        if(lang === 'kn') {
+            window.location.hash = '#googtrans(kn)';
+            if(applyKannada()) {
+                console.log('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
+            } else {
+                setTimeout(() => location.reload(), 500);
+            }
+        } else {
+            window.location.hash = '#googtrans(en)';
+            var iframe = document.querySelector('.goog-te-menu-frame');
+            if(iframe && iframe.contentDocument) {
+                var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
+                if(select) {
+                    select.value = 'en';
+                    select.dispatchEvent(new Event('change'));
+                    console.log('Language changed to English');
+                    return;
+                }
+            }
+            setTimeout(() => location.reload(), 500);
+        }
+    }
+</script>
+</body>
+</html>

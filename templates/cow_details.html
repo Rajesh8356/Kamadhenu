@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cow Details - Kamadhenu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --primary: #043c07;
+      --secondary: #ffc107;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --light-green: #e8f5e9;
+    }
+    
+    body {
+      background-color: #f5f9f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .dashboard-container {
+      width: 100%;
+      margin: 0;
+    }
+
+    .sidebar {
+      background: linear-gradient(to bottom, var(--primary), #1b5e20);
+      color: white;
+      height: 100vh;
+      position: fixed;
+      width: 260px;
+      padding-top: 20px;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    
+    .main-content { 
+      margin-left: 250px; 
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .header {
+      background-color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .welcome-text { 
+      color: var(--primary); 
+      font-weight: 600; 
+    }
+
+    /* Cow ID Card Styles */
+    .id-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      border: 2px solid var(--primary);
+      overflow: hidden;
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .id-card-header {
+      background: linear-gradient(to right, var(--primary), #1b5e20);
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .id-card-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(to right, #ffc107, #ffeb3b);
+    }
+
+    .id-card-body {
+      padding: 25px;
+    }
+
+    /* Row Layout */
+    .card-row {
+      display: flex;
+      gap: 25px;
+      margin-bottom: 25px;
+      align-items: flex-start;
+    }
+
+    .card-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .photo-container {
+      flex: 0 0 200px;
+      text-align: center;
+    }
+
+    .details-container {
+      flex: 1;
+    }
+
+    .farmer-photo {
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 3px solid var(--primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .cow-photo {
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 3px solid var(--primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .photo-placeholder {
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--light-green), #e8f5e9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--primary);
+    }
+
+    .photo-placeholder i {
+      font-size: 3rem;
+      color: var(--primary);
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .detail-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .detail-section h5 {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 0.9rem;
+    }
+
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: var(--primary);
+      min-width: 120px;
+    }
+
+    .detail-value {
+      color: #495057;
+      text-align: right;
+      flex: 1;
+    }
+
+    /* QR Code and Authorization Section */
+    .qr-auth-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 2px solid #000; 
+    }
+
+    .authorization-section {
+      text-align: left;
+      flex: 1;
+    }
+
+    .signature-line {
+      width: 200px;
+      border-bottom: 1px solid #333;
+      margin-bottom: 5px;
+    }
+
+    .authorization-text {
+      font-family: 'Times New Roman', serif;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .qr-section {
+      text-align: center;
+    }
+
+    .qr-code {
+      width: 150px;
+      height: 150px;
+      border: 2px solid var(--primary);
+      border-radius: 6px;
+      padding: 3px;
+      background: white;
+    }
+
+    .download-btn {
+      background: linear-gradient(to right, var(--primary), #1b5e20);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(4, 60, 7, 0.3);
+      color: white;
+    }
+
+    .cow-id-badge {
+      background: linear-gradient(135deg, #ffc107, #ffeb3b);
+      color: var(--dark);
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-weight: bold;
+      font-size: 1rem;
+      display: inline-block;
+      margin: 8px 0;
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    }
+
+    .logo {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 30px;
+    }
+    
+    .nav-item { 
+      margin: 10px 0; 
+    }
+
+    .nav-link {
+      color: rgba(255,255,255,0.8);
+      padding: 8px 16px;
+      border-radius: 5px;
+      margin: 5px 15px;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active { 
+      background-color: rgba(255,255,255,0.1); 
+      color: white; 
+    }
+
+    .nav-link i { 
+      margin-right: 10px; 
+      width: 20px; 
+      text-align: center; 
+    }
+
+    .logout-btn {
+      background-color: var(--secondary);
+      color: var(--dark);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover { 
+      background-color: #e0a800; 
+      transform: translateY(-2px); 
+    }
+
+    .cow-background {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%232e7d32" fill-opacity="0.05" d="M50,10A40,40 0 1,1 50,90A40,40 0 1,1 50,10z M30,30 Q50,15 70,30 Q65,50 70,70 Q50,85 30,70 Q35,50 30,30 z"></path></svg>');
+      background-repeat: repeat;
+      background-size: 200px;
+    }
+
+    /* Insurance Section */
+    .insurance-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #17a2b8;
+      margin-top: 15px;
+    }
+
+    .insurance-section h5 {
+      color: #17a2b8;
+      border-bottom: 2px solid #17a2b8;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    /* Parent Details Section */
+    .parent-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #6f42c1;
+      margin-top: 15px;
+    }
+
+    .parent-section h5 {
+      color: #6f42c1;
+      border-bottom: 2px solid #6f42c1;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    /* Submenu styles */
+    .submenu {
+      list-style: none;
+      padding-left: 30px;
+      display: none;
+    }
+    
+    .submenu .nav-link {
+      font-size: 14px;
+      padding: 6px 14px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .submenu .nav-link:hover {
+      color: #fff;
+    }
+
+    /* Mobile menu toggle button */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Overlay for mobile when sidebar is open */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    
+    .overlay.active {
+      display: block;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 992px) {
+      .card-row {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .photo-container {
+        flex: 0 0 auto;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .qr-auth-section {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .authorization-section {
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: 70%;
+        max-width: 250px;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .header {
+        padding: 15px 15px 15px 50px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .farmer-photo, .cow-photo {
+        width: 150px;
+        height: 150px;
+      }
+      
+      .photo-placeholder {
+        width: 150px;
+        height: 150px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .main-content {
+        padding: 10px;
+      }
+      
+      .id-card-body {
+        padding: 20px;
+      }
+      
+      .logo h2 {
+        font-size: 1.5rem;
+      }
+      
+      .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      
+      .detail-value {
+        text-align: left;
+      }
+      
+      .cow-id-badge {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+      }
+    }
+     /* Language Selector Styles - BOTTOM */
+    .language-selector {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10000;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 25px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        gap: 10px;
+        border: 2px solid #27ae60;
+    }
+
+    .lang-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .lang-btn.english {
+        background: #007bff;
+        color: white;
+    }
+
+    .lang-btn.kannada {
+        background: #ff9800;
+        color: white;
+    }
+
+    .lang-btn.active {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+    }
+
+    /* Hide Google banner */
+    .goog-te-banner-frame { display: none !important; }
+    body { top: 0 !important; }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .language-selector {
+            bottom: 10px;
+            right: 10px;
+            padding: 6px 10px;
+        }
+        
+        .lang-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+    }
+    /* Completely hide ALL Google Translate elements */
+    .goog-te-banner-frame,
+    .goog-te-banner,
+    .goog-te-banner-wrapper,
+    .skiptranslate,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    .goog-tooltip,
+    .goog-tooltip:hover,
+    .goog-text-highlight {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+    }
+    
+    /* Prevent body shift */
+    body {
+        top: 0px !important;
+        position: static !important;
+    }
+    
+    /* Hide the translation menu if it appears */
+    .goog-te-menu-frame {
+        display: none !important;
+    }
+  </style>
+</head>
+<body class="cow-background">
+  <!-- Mobile menu toggle -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay"></div>
+
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="logo">
+        <h2><i class="fas fa-cow"></i> Kamadhenu</h2>
+        <p class="mb-0">Cow Management System</p>
+      </div>
+      
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/dashboard">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/add_cow">
+            <i class="fas fa-plus-circle"></i> Add New Cow
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cows">
+            <i class="fas fa-list"></i> View My Cows
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/find_cow">
+            <i class="fas fa-search"></i> Find Cow
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/milk_yield">
+            <i class="fas fa-tint"></i> Milk Yield
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/book_appointment">
+            <i class="fas fa-syringe"></i> Book Appointment
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('add_geotag') }}">
+            <i class="fas fa-map-marker-alt"></i> Add Geo Tag
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('analytics') }}">
+            <i class="fas fa-chart-bar"></i> Analytics
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+            <i class="fas fa-chart-line"></i> Market Place <i class="fas fa-caret-down float-end"></i>
+          </a>
+          <ul class="submenu">
+            <li><a class="nav-link" href="/buy_cow"><i class="fas fa-shopping-cart"></i> Buy Cows</a></li>
+            <li><a class="nav-link" href="/sell_cow"><i class="fas fa-hand-holding-usd"></i> Sell Cows</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/sold_cows">
+            <i class="fas fa-check-circle"></i> Sale History
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Header -->
+      <div class="header">
+        <div>
+          <h2 class="welcome-text">Cow Details</h2>
+          <p class="mb-0 text-muted">Complete information about your cattle</p>
+        </div>
+        <a href="{{ url_for('farmer_logout') }}" class="btn btn-danger">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+
+      <!-- Cow ID Card -->
+      {% if cow %}
+      <div class="id-card" id="idCard">
+        <div class="id-card-header">
+          <h3 class="mb-2"><i class="fas fa-cow me-2"></i>Kamadhenu Cattle Registry</h3>
+          <div class="cow-id-badge">
+            <i class="fas fa-id-card me-2"></i>{{ cow.cow_id }}
+          </div>
+          <p class="mb-0" style="font-size: 0.9rem;">Government Registered Cattle Identification</p>
+        </div>
+
+        <div class="id-card-body">
+          <!-- First Row: Farmer Photo and Details -->
+          <div class="card-row">
+            <!-- Farmer Photo -->
+            <div class="photo-container">
+              {% if farmer_photo %}
+              <img src="{{ url_for('static', filename='uploads/farmers/' + farmer_photo) }}" 
+                   class="farmer-photo" 
+                   alt="Farmer Photo">
+              {% else %}
+              <div class="photo-placeholder">
+                <i class="fas fa-user"></i>
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Farmer Details -->
+            <div class="details-container">
+              <div class="detail-section">
+                <h5><i class="fas fa-user me-2"></i>Farmer Details</h5>
+                <div class="detail-item">
+                  <span class="detail-label">Farmer ID:</span>
+                  <span class="detail-value">{{ farmer.farmer_id }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Name:</span>
+                  <span class="detail-value">{{ farmer.name }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Phone:</span>
+                  <span class="detail-value">{{ farmer.phone }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Address:</span>
+                  <span class="detail-value">{{ farmer.address or 'Not specified' }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">State:</span>
+                  <span class="detail-value">{{ farmer.state }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Second Row: Cow Photo and Details -->
+          <div class="card-row">
+            <!-- Cow Photo -->
+            <div class="photo-container">
+              {% if cow.photo %}
+              <img src="{{ url_for('static', filename='uploads/cow/' ~ cow.photo) }}" 
+                   class="cow-photo" 
+                   alt="Cow Photo">
+              {% else %}
+              <div class="photo-placeholder">
+                <i class="fas fa-cow"></i>
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Cow Details -->
+            <div class="details-container">
+              <div class="details-grid">
+                <!-- Left Column: Basic Details -->
+                <div class="detail-section">
+                  <h5><i class="fas fa-cow me-2"></i>Cattle Details</h5>
+                  <div class="detail-item">
+                    <span class="detail-label">Cattle Type:</span>
+                    <span class="detail-value">{{ cow.cattle_type or 'Cow' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Breed:</span>
+                    <span class="detail-value">{{ cow.breed }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Date of Birth:</span>
+                    <span class="detail-value">
+                      {% if cow.date_of_birth %}
+                        {{ cow.date_of_birth }}
+                      {% else %}
+                        Not specified
+                      {% endif %}
+                    </span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Age:</span>
+                    <span class="detail-value">
+                      {% if cow.age %}
+                        {% set years = cow.age // 12 %}
+                        {% set months = cow.age % 12 %}
+                        {% if years > 0 %}
+                          {{ years }} year{% if years > 1 %}s{% endif %}
+                        {% endif %}
+                        {% if months > 0 %}
+                          {% if years > 0 %} and {% endif %}{{ months }} month{% if months > 1 %}s{% endif %}
+                        {% endif %}
+                        ({{ cow.age }} months)
+                      {% else %}
+                        Not specified
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Right Column: Physical Details -->
+                <div class="detail-section">
+                  <h5><i class="fas fa-weight me-2"></i>Physical Details</h5>
+                  <div class="detail-item">
+                    <span class="detail-label">Weight:</span>
+                    <span class="detail-value">{{ cow.weight }} kg</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Color:</span>
+                    <span class="detail-value">{{ cow.color or 'Not specified' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Milk Yield:</span>
+                    <span class="detail-value">
+                      {% if cow.cattle_type and cow.cattle_type.lower() in ['bull', 'male buffalo', 'ox', 'male_buffalo', 'calf'] %}
+                        N/A
+                      {% else %}
+                        {{ cow.milk_yield or '0' }} L/day
+                      {% endif %}
+                    </span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Registered On:</span>
+                    <span class="detail-value">{{ cow.created_at[:10] }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Parent Details Section (Only for Calves) -->
+              {% if cow.cattle_type and cow.cattle_type.lower() == 'calf' %}
+              <div class="parent-section">
+                <h5><i class="fas fa-family me-2"></i>Parent Details</h5>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Mother ID:</span>
+                    <span class="detail-value">
+                      {% if cow.mother_id %}
+                        {{ cow.mother_id }}
+                      {% else %}
+                        Not specified
+                      {% endif %}
+                    </span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Father ID:</span>
+                    <span class="detail-value">
+                      {% if cow.father_id %}
+                        {{ cow.father_id }}
+                      {% else %}
+                        Not specified
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- Insurance Details Section -->
+              {% if cow.insurance_by or cow.insurance_policy_number or cow.insurance_valid_upto %}
+              <div class="insurance-section">
+                <h5><i class="fas fa-shield-alt me-2"></i>Insurance Details</h5>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Insurance By:</span>
+                    <span class="detail-value">{{ cow.insurance_by or 'Not specified' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Policy Number:</span>
+                    <span class="detail-value">{{ cow.insurance_policy_number or 'Not specified' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Valid Upto:</span>
+                    <span class="detail-value">
+                      {% if cow.insurance_valid_upto %}
+                        {{ cow.insurance_valid_upto }}
+                      {% else %}
+                        Not specified
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- QR Code and Authorization Section -->
+          <div class="qr-auth-section">
+            <!-- Authorization Section -->
+            <div class="authorization-section">
+              <div class="authorization-text">
+                <div>Authorized by</div>
+                <div><strong>Dr. Vishwanath S</strong></div>
+              </div>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="qr-section">
+              {% if qr %}
+              <img src="{{ qr }}" class="qr-code" alt="QR Code">
+              {% else %}
+              <div class="qr-code d-flex align-items-center justify-content-center bg-light">
+                <i class="fas fa-qrcode" style="font-size: 3rem; color: #ccc;"></i>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="text-center mt-4">
+        <button class="download-btn" onclick="downloadIDCard()">
+          <i class="fas fa-download me-2"></i>Download ID Card
+        </button>
+        <a href="/cows" class="btn btn-primary ms-2">
+          <i class="fas fa-arrow-left me-2"></i>Back to My Cows
+        </a>
+      </div>
+
+      {% else %}
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <div class="cow-icon mb-3">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545;"></i>
+          </div>
+          <h4 class="text-danger">Cow Not Found</h4>
+          <p class="text-muted mb-3">The cow you're looking for doesn't exist or has been removed.</p>
+          <a href="/cows" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to My Cows
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    function toggleSubmenu(event) {
+      event.preventDefault();
+      const submenu = event.target.closest("li").querySelector(".submenu");
+      submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+    }
+
+    function downloadIDCard() {
+      // Get the ID card element
+      const idCard = document.getElementById('idCard');
+      
+      // Use html2canvas to capture the ID card as an image
+      html2canvas(idCard, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true, // Handle cross-origin images
+        allowTaint: true
+      }).then(canvas => {
+        // Convert canvas to data URL
+        const imageData = canvas.toDataURL('image/png');
+        
+        // Create a temporary link to download the image
+        const link = document.createElement('a');
+        link.href = imageData;
+        link.download = 'cow-id-card-' + '{{ cow.cow_id }}' + '.png';
+        
+        // Trigger the download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }).catch(error => {
+        console.error('Error generating ID card:', error);
+        alert('Error generating ID card. Please try again.');
+      });
+    }
+
+    // Toggle mobile sidebar
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const overlay = document.getElementById('overlay');
+    
+    menuToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      
+      // Change icon based on sidebar state
+      const icon = menuToggle.querySelector('i');
+      if (sidebar.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      }
+    });
+    
+    // Close sidebar when clicking on overlay
+    overlay.addEventListener('click', function() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      const icon = menuToggle.querySelector('i');
+      icon.classList.remove('fa-times');
+      icon.classList.add('fa-bars');
+    });
+    
+    // Close sidebar when clicking on a nav link (mobile)
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          const icon = menuToggle.querySelector('i');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+    });
+  </script>
+  <script>
+    // Language translation functions
+    function googleTranslateElementInit() {
+        if (typeof google !== 'undefined' && google.translate) {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,kn',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            const savedLang = localStorage.getItem('selectedLanguage');
+            if(savedLang === 'kn') {
+                setTimeout(() => applyKannada(), 1000);
+            }
+        }
+    }
+
+    window.onload = function() {
+        if (typeof google !== 'undefined' && google.translate) {
+            googleTranslateElementInit();
+        } else {
+            var script = document.createElement('script');
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            document.body.appendChild(script);
+        }
+        
+        const savedLang = localStorage.getItem('selectedLanguage');
+        if(savedLang === 'kn') {
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.lang-btn.kannada').classList.add('active');
+            setTimeout(() => applyKannada(), 2000);
+        }
+    };
+
+    function applyKannada() {
+        var iframe = document.querySelector('.goog-te-menu-frame');
+        if(iframe && iframe.contentDocument) {
+            var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
+            if(select) {
+                select.value = 'kn';
+                select.dispatchEvent(new Event('change'));
+                return true;
+            }
+        }
+        
+        var elements = document.querySelectorAll('.goog-te-menu2-select');
+        if(elements.length > 0) {
+            elements[0].value = 'kn';
+            elements[0].dispatchEvent(new Event('change'));
+            return true;
+        }
+        
+        return false;
+    }
+
+    function setLanguage(lang) {
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        localStorage.setItem('selectedLanguage', lang);
+        
+        if(lang === 'kn') {
+            window.location.hash = '#googtrans(kn)';
+            if(applyKannada()) {
+                console.log('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
+            } else {
+                setTimeout(() => location.reload(), 500);
+            }
+        } else {
+            window.location.hash = '#googtrans(en)';
+            var iframe = document.querySelector('.goog-te-menu-frame');
+            if(iframe && iframe.contentDocument) {
+                var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
+                if(select) {
+                    select.value = 'en';
+                    select.dispatchEvent(new Event('change'));
+                    console.log('Language changed to English');
+                    return;
+                }
+            }
+            setTimeout(() => location.reload(), 500);
+        }
+    }
+</script>
+</body>
+</html>
