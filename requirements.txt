@@ -7,9 +7,9 @@ pillow==11.0.0
 opencv-python-headless==4.8.1.78
 gunicorn==21.2.0
 
-# PyTorch with CPU-only for Render (lighter, no CUDA)
+# PyTorch with CPU-only for Render
 torch==2.5.1
 torchvision==0.20.1
 
-# Use an older ultralytics version that works with PyTorch 2.5.1
+# Use an older ultralytics version
 ultralytics==8.0.0
