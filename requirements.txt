@@ -5,4 +5,7 @@ googletrans==4.0.0-rc1
 python-dotenv==1.0.1
 qrcode==7.4.2
 pillow==11.0.0
+opencv-python-headless==4.8.1.78 
+ultralytics==8.0.196
 gunicorn
+
