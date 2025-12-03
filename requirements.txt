@@ -1,11 +1,15 @@
 Flask==3.0.3
 google-generativeai==0.8.2
 deep-translator==1.11.4
-googletrans==4.0.0-rc1
 python-dotenv==1.0.1
 qrcode==7.4.2
 pillow==11.0.0
-opencv-python-headless==4.8.1.78 
-ultralytics==8.0.196
-gunicorn
+opencv-python-headless==4.8.1.78
+gunicorn==21.2.0
 
+# PyTorch with CPU-only for Render (lighter, no CUDA)
+torch==2.5.1
+torchvision==0.20.1
+
+# Use an older ultralytics version that works with PyTorch 2.5.1
+ultralytics==8.0.0
