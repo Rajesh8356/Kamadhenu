@@ -1734,6 +1734,10 @@ def clear_muzzle():
 
 
 
+from ultralytics.nn.tasks import DetectionModel
+
+# Fix for PyTorch 2.6+ "weights_only=True" change
+torch.serialization.add_safe_globals([DetectionModel])
 
 
 # Load YOLO muzzle model
@@ -4015,3 +4019,4 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
