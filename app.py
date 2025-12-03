@@ -62,7 +62,102 @@ QR_FOLDER = "static/qrcodes"
 if not os.path.exists(QR_FOLDER):
     os.makedirs(QR_FOLDER)
 
-# Ensure uploads folder exists
+
+
+# ================= YOLO MODEL LAZY LOADING ==================
+import torch
+
+# Global cache for models
+_muzzle_model_cache = None
+_disease_model_cache = None
+
+def get_muzzle_model():
+    """Lazy load the muzzle detection YOLO model"""
+    global _muzzle_model_cache
+    if _muzzle_model_cache is None:
+        try:
+            print("Loading muzzle detection model...")
+            from ultralytics import YOLO
+            
+            # Try to add safe globals if needed (for PyTorch 2.6+)
+            try:
+                from ultralytics.nn.tasks import DetectionModel
+                if hasattr(torch.serialization, 'add_safe_globals'):
+                    torch.serialization.add_safe_globals([DetectionModel])
+            except:
+                pass
+            
+            _muzzle_model_cache = YOLO("best_new.pt", verbose=False)
+            print("✅ Muzzle detection model loaded successfully")
+        except Exception as e:
+            print(f"⚠️ Warning: Could not load muzzle model: {e}")
+            print("⚠️ Using dummy model for development")
+            
+            # Create a dummy model for development/testing
+            class DummyModel:
+                def __init__(self):
+                    self.names = {0: 'muzzle'}
+                    
+                def __call__(self, frame, *args, **kwargs):
+                    # Return a dummy result object
+                    class Result:
+                        def __init__(self):
+                            class Boxes:
+                                def __init__(self):
+                                    self.boxes = None
+                            self.boxes = Boxes()
+                    return [Result()]
+                    
+            _muzzle_model_cache = DummyModel()
+    
+    return _muzzle_model_cache
+
+def get_disease_model():
+    """Lazy load the disease detection YOLO model"""
+    global _disease_model_cache
+    if _disease_model_cache is None:
+        try:
+            print("Loading disease detection model...")
+            from ultralytics import YOLO
+            
+            # Try to add safe globals if needed (for PyTorch 2.6+)
+            try:
+                from ultralytics.nn.tasks import DetectionModel
+                if hasattr(torch.serialization, 'add_safe_globals'):
+                    torch.serialization.add_safe_globals([DetectionModel])
+            except:
+                pass
+            
+            _disease_model_cache = YOLO("best.pt", verbose=False)
+            print("✅ Disease detection model loaded successfully")
+        except Exception as e:
+            print(f"⚠️ Warning: Could not load disease model: {e}")
+            print("⚠️ Using dummy model for development")
+            
+            # Create a dummy model for development/testing
+            class DummyModel:
+                def __init__(self):
+                    self.names = {}
+                    
+                def predict(self, source=None, conf=None, save=False):
+                    # Return a dummy result object
+                    class Result:
+                        def __init__(self):
+                            self.boxes = None
+                            self.plot = lambda: None
+                    return [Result()]
+                    
+            _disease_model_cache = DummyModel()
+    
+    return _disease_model_cache
+
+# Add these after the lazy loading functions
+DB_FILE = "cow_embeddings.json"
+MUZZLE_FOLDER = "static/uploads/muzzles"
+os.makedirs(MUZZLE_FOLDER, exist_ok=True)
+CONFIDENCE_THRESHOLD = 0.7
+IDENTIFICATION_THRESHOLD = 0.6
+
 # ================= SMS Sending Function ==================
 def send_sms(phone, message):
     """Send SMS using Fast2SMS API"""
@@ -1734,19 +1829,10 @@ def clear_muzzle():
 
 
 
-from ultralytics.nn.tasks import DetectionModel
-
-# Fix for PyTorch 2.6+ "weights_only=True" change
-torch.serialization.add_safe_globals([DetectionModel])
-
 
 # Load YOLO muzzle model
-yolo_model = YOLO("best_new.pt")
-DB_FILE = "cow_embeddings.json"
-MUZZLE_FOLDER = "static/uploads/muzzles"
-os.makedirs(MUZZLE_FOLDER, exist_ok=True)
-CONFIDENCE_THRESHOLD = 0.7
-IDENTIFICATION_THRESHOLD = 0.6
+#yolo_model = YOLO("best_new.pt")
+
 
 def extract_features(crop):
     """Extract features from muzzle image"""
@@ -1786,7 +1872,8 @@ def identify_cow_from_muzzle():
         if not ret:
             break
 
-        results = yolo_model(frame)[0]
+        model = get_muzzle_model()
+        results = model(frame)[0]
         best_detection = None
         max_confidence = 0
 
@@ -1930,7 +2017,8 @@ def start_automatic_scan():
             return jsonify({"success": False, "message": "Failed to process image"})
 
         # Detect muzzle using YOLO
-        results = yolo_model(frame)[0]
+        model = get_muzzle_model()
+        results = model(frame)[0]
         cow_details = None
         message = "No muzzle detected"
 
@@ -2085,7 +2173,8 @@ def register_muzzle_automatically():
         if not ret:
             break
 
-        results = yolo_model(frame)[0]
+        model = get_muzzle_model()
+        results = model(frame)[0]
         muzzle_detected = False
 
         for box in results.boxes:
@@ -2190,7 +2279,8 @@ def capture_muzzle_web():
             return jsonify({"success": False, "message": "Failed to process image"})
 
         # Detect muzzle using YOLO
-        results = yolo_model(frame)[0]
+        model = get_muzzle_model()
+        results = model(frame)[0]
         muzzle_detected = False
         muzzle_id = generate_muzzle_id()
         muzzle_filename = None
@@ -2269,9 +2359,7 @@ def disease_prediction():
                 
                 # Load your disease prediction model
                 # Replace "disease_model.pt" with your actual model path
-                disease_model = YOLO("best.pt")  # Your disease detection model
-                
-                # Run prediction
+                disease_model = get_disease_model()
                 results = disease_model.predict(source=temp_path, conf=0.25, save=False)
                 
                 # Process results
@@ -4019,4 +4107,5 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
