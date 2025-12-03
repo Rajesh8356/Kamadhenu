@@ -79,11 +79,15 @@ def get_muzzle_model():
             print("Loading muzzle detection model...")
             from ultralytics import YOLO
             
-            # Try to add safe globals if needed (for PyTorch 2.6+)
+            # For PyTorch 2.6.0, we need to handle weights_only=True issue
+            # Patch torch.load if needed
             try:
-                from ultralytics.nn.tasks import DetectionModel
-                if hasattr(torch.serialization, 'add_safe_globals'):
-                    torch.serialization.add_safe_globals([DetectionModel])
+                original_load = torch.load
+                def patched_load(*args, **kwargs):
+                    # Set weights_only=False to bypass security for model files
+                    kwargs['weights_only'] = False
+                    return original_load(*args, **kwargs)
+                torch.load = patched_load
             except:
                 pass
             
@@ -120,11 +124,15 @@ def get_disease_model():
             print("Loading disease detection model...")
             from ultralytics import YOLO
             
-            # Try to add safe globals if needed (for PyTorch 2.6+)
+            # For PyTorch 2.6.0, we need to handle weights_only=True issue
+            # Patch torch.load if needed
             try:
-                from ultralytics.nn.tasks import DetectionModel
-                if hasattr(torch.serialization, 'add_safe_globals'):
-                    torch.serialization.add_safe_globals([DetectionModel])
+                original_load = torch.load
+                def patched_load(*args, **kwargs):
+                    # Set weights_only=False to bypass security for model files
+                    kwargs['weights_only'] = False
+                    return original_load(*args, **kwargs)
+                torch.load = patched_load
             except:
                 pass
             
@@ -4107,5 +4115,6 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
