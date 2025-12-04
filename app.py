@@ -1613,7 +1613,6 @@ def get_vet_details(vet_id):
 
 
 
-# Update the register route to handle photo upload
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -1625,12 +1624,17 @@ def register():
         address = request.form["address"]
         password = request.form["password"]
         
+        # Store form data in session to repopulate
+        session['register_data'] = {
+            'name': name, 'email': email, 'phone': phone,
+            'state': state, 'city': city, 'address': address
+        }
+        
         # Handle photo upload
         photo_filename = None
         if "photo" in request.files:
             photo_file = request.files["photo"]
             if photo_file and photo_file.filename != "":
-                # Generate secure filename
                 file_extension = os.path.splitext(photo_file.filename)[1]
                 photo_filename = f"farmer_{phone}_{int(time.time())}{file_extension}"
                 photo_path = os.path.join(app.config["FARMER_UPLOAD_FOLDER"], photo_filename)
@@ -1639,17 +1643,39 @@ def register():
         conn = get_db()
         cursor = conn.cursor()
         try:
+            # Check if email exists
+            cursor.execute("SELECT * FROM farmers WHERE email = ?", (email,))
+            if cursor.fetchone():
+                session['register_error'] = f"❌ Email '{email}' is already registered!"
+                return redirect(url_for("register"))
+            
+            # Check if phone exists
+            cursor.execute("SELECT * FROM farmers WHERE phone = ?", (phone,))
+            if cursor.fetchone():
+                session['register_error'] = f"❌ Phone number '{phone}' is already registered!"
+                return redirect(url_for("register"))
+            
+            # Insert new farmer
             cursor.execute("""INSERT INTO farmers 
-                              (name, email, phone, state, city, address, password, photo) 
-                              VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                           (name, email, phone, state, city, address, password, photo_filename))
+                            (name, email, phone, state, city, address, password, photo) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                        (name, email, phone, state, city, address, password, photo_filename))
             conn.commit()
-            flash("Registration successful! Please login.", "success")
+            
+            # Clear session data
+            session.pop('register_data', None)
+            session.pop('register_error', None)
+            
+            # Success message
+            session['register_success'] = "✅ Registration successful! Please login."
             return redirect(url_for("login"))
-        except sqlite3.IntegrityError:
-            flash("Email or Phone already registered!", "danger")
+            
+        except sqlite3.Error as e:
+            session['register_error'] = f"❌ Registration failed: {str(e)}"
+            return redirect(url_for("register"))
         finally:
             conn.close()
+    
     return render_template("register.html")
 
 # ---------------- Farmer Login ----------------
@@ -4414,6 +4440,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
