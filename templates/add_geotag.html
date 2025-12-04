@@ -18,6 +18,7 @@
     body {
       background-color: #f5f9f5;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
     }
     
     .dashboard-container {
@@ -34,11 +35,15 @@
       padding-top: 20px;
       box-shadow: 3px 0 10px rgba(0,0,0,0.1);
       overflow-y: auto;
+      z-index: 1000;
+      transition: all 0.3s ease;
     }
     
     .main-content {
-      margin-left: 250px;
+      margin-left: 260px;
       padding: 20px;
+      transition: all 0.3s ease;
+      width: calc(100% - 260px);
     }
     
     .header {
@@ -208,18 +213,96 @@
       font-weight: bold;
     }
     
+    /* Mobile menu toggle button */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Overlay for mobile when sidebar is open */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    
+    .overlay.active {
+      display: block;
+    }
+    
+    /* Mobile responsive styles */
     @media (max-width: 768px) {
       .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
+        transform: translateX(-100%);
+        width: 70%;
+        max-width: 250px;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
       }
       
       .main-content {
         margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .header {
+        padding: 15px 15px 15px 50px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .container-box {
+        padding: 20px;
+      }
+      
+      .form-select {
+        padding: 10px 12px;
       }
     }
-     /* Language Selector Styles - BOTTOM */
+
+    @media (max-width: 576px) {
+      .main-content {
+        padding: 10px;
+      }
+      
+      .container-box {
+        padding: 15px;
+      }
+      
+      .logo h2 {
+        font-size: 1.5rem;
+      }
+      
+      .btn-success, .btn-primary {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+    }
+      /* Language Selector Styles - BOTTOM */
     .language-selector {
         position: fixed;
         bottom: 20px;
@@ -307,9 +390,17 @@
   </style>
 </head>
 <body class="cow-background">
+  <!-- Mobile menu toggle -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay"></div>
+
   <div class="dashboard-container">
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <div class="logo">
         <h2><i class="fas fa-cow"></i> Kamadhenu</h2>
         <p class="mb-0">Cow Management System</p>
@@ -331,11 +422,11 @@
             <i class="fas fa-list"></i> View My Cows
           </a>
         </li>
-          <li class="nav-item">
-        <a class="nav-link" href="/find_cow">
-          <i class="fas fa-search"></i> Find Cow
-        </a>
-      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/find_cow">
+            <i class="fas fa-search"></i> Find Cow
+          </a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="/milk_yield">
             <i class="fas fa-tint"></i> Milk Yield
@@ -345,13 +436,13 @@
           <a class="nav-link" href="/disease_prediction">
               <i class="fas fa-stethoscope"></i> Disease Detection
           </a>
-      </li>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="/book_appointment">
             <i class="fas fa-syringe"></i> Book Appointment
           </a>
         </li>
-         <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link" href="{{ url_for('farmer_treatments') }}">
             <i class="fas fa-syringe"></i> Treatment History
           </a>
@@ -361,12 +452,11 @@
             <i class="fas fa-map-marker-alt"></i> Add Geo Tag
           </a>
         </li>
-       <li class="nav-item">
-  <a class="nav-link" href="{{ url_for('analytics') }}">
-   <i class="fas fa-chart-bar"></i> Analytics
-  </a>
-</li>
-
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('analytics') }}">
+            <i class="fas fa-chart-bar"></i> Analytics
+          </a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
             <i class="fas fa-chart-line"></i> Market Place <i class="fas fa-caret-down float-end"></i>
@@ -377,7 +467,7 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="/sold_cows">
+          <a class="nav-link" href="/sold_cows">
             <i class="fas fa-check-circle"></i> Sale History
           </a>
         </li>
@@ -385,7 +475,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
       <!-- Header -->
       <div class="header">
         <div>
@@ -443,6 +533,51 @@
   </div>
 
   <script>
+    // Mobile sidebar toggle functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const overlay = document.getElementById('overlay');
+    
+    menuToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      
+      // Change icon based on sidebar state
+      const icon = menuToggle.querySelector('i');
+      if (sidebar.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      }
+    });
+    
+    // Close sidebar when clicking on overlay
+    overlay.addEventListener('click', function() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      const icon = menuToggle.querySelector('i');
+      icon.classList.remove('fa-times');
+      icon.classList.add('fa-bars');
+    });
+    
+    // Close sidebar when clicking on a nav link (mobile)
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          const icon = menuToggle.querySelector('i');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+    });
+
+    // Existing functions from your code
     function toggleSubmenu(event) {
       event.preventDefault();
       const submenu = event.target.closest("li").querySelector(".submenu");
@@ -517,6 +652,8 @@
     }
   </script>
   
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Language translation functions
