@@ -2080,7 +2080,7 @@ def add_cow():
         conn.close()
 
         # Generate QR Code
-        qr_data = f"http://127.0.0.1:5000/cow/{cow_id}"
+        qr_data = f"https://kamadhenu-zdm2.onrender.com/cow/{cow_id}"
         qr_img = qrcode.make(qr_data)
         qr_path = os.path.join(QR_FOLDER, f"{cow_id}.png")
         qr_img.save(qr_path)
@@ -4414,6 +4414,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
