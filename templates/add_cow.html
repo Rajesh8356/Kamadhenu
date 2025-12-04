@@ -539,29 +539,39 @@
             <!-- Cattle Type Dropdown -->
             <div class="col-md-6 mb-3">
               <label class="form-label">Cattle Type *</label>
-              <select name="cattle_type" class="form-control" id="cattleType" required onchange="toggleFields()">
+            <select name="cattle_type" class="form-control" id="cattleType" required onchange="toggleCattleTypeFields()">
                 <option value="">Select Cattle Type</option>
                 <option value="cow">Cow</option>
                 <option value="bull">Bull</option>
                 <option value="buffalo">Buffalo</option>
                 <option value="male_buffalo">Male Buffalo</option>
                 <option value="calf">Calf</option>
+                <option value="other">Other</option>
               </select>
+              <!-- Hidden input for "Other" cattle type -->
+  <div id="cattleTypeOtherField" style="display: none; margin-top: 10px;">
+    <input type="text" name="cattle_type_other" class="form-control" id="cattleTypeOtherInput" placeholder="Specify cattle type">
+  </div>
             </div>
 
             <!-- Breed Dropdown -->
             <div class="col-md-6 mb-3">
               <label class="form-label">Breed *</label>
-              <select name="breed" class="form-control" id="breedSelect" required>
+           <select name="breed" class="form-control" id="breedSelect" required onchange="toggleBreedFields()">
                 <option value="">Select Breed</option>
                 {% for breed in breeds %}
                 <option value="{{ breed.breed_name }}" data-type="{{ breed.cattle_type }}">
                   {{ breed.breed_name }}
                 </option>
                 {% endfor %}
+                <option value="other">Other</option>
               </select>
-              <small class="text-muted" id="breedDescription"></small>
+
+              <div id="breedOtherField" style="display: none; margin-top: 10px;">
+              <input type="text" name="breed_other" class="form-control" id="breedOtherInput" placeholder="Specify breed">
             </div>
+            <small class="text-muted" id="breedDescription"></small>
+              </div>
 
             <!-- Date of Birth and Age Fields -->
             <div class="col-md-6 mb-3">
@@ -682,7 +692,7 @@
     </div>
   </div>
 
-  <script>
+ <script>
     // Function to calculate age from date of birth
     function calculateAge() {
       const dobInput = document.getElementById('dateOfBirth');
@@ -707,6 +717,46 @@
       } else {
         ageField.value = '';
       }
+    }
+
+    // Function to handle Cattle Type "Other" selection
+    function toggleCattleTypeFields() {
+      const cattleType = document.getElementById('cattleType').value;
+      const cattleTypeOtherField = document.getElementById('cattleTypeOtherField');
+      const cattleTypeOtherInput = document.getElementById('cattleTypeOtherInput');
+      
+      // Show/hide "Other" textbox
+      if (cattleType === 'other') {
+        cattleTypeOtherField.style.display = 'block';
+        cattleTypeOtherInput.required = true;
+      } else {
+        cattleTypeOtherField.style.display = 'none';
+        cattleTypeOtherInput.required = false;
+        cattleTypeOtherInput.value = '';
+      }
+      
+      // Call original toggleFields function
+      toggleFields();
+    }
+
+    // Function to handle Breed "Other" selection
+    function toggleBreedFields() {
+      const breedSelect = document.getElementById('breedSelect');
+      const breedOtherField = document.getElementById('breedOtherField');
+      const breedOtherInput = document.getElementById('breedOtherInput');
+      
+      // Show/hide "Other" textbox
+      if (breedSelect.value === 'other') {
+        breedOtherField.style.display = 'block';
+        breedOtherInput.required = true;
+      } else {
+        breedOtherField.style.display = 'none';
+        breedOtherInput.required = false;
+        breedOtherInput.value = '';
+      }
+      
+      // Call breed description function
+      showBreedDescription(breedSelect);
     }
 
     // Function to toggle fields based on cattle type
@@ -746,8 +796,8 @@
       // First, hide all options except the default
       for (let i = 0; i < options.length; i++) {
         const option = options[i];
-        if (option.value === '') {
-          option.style.display = 'block'; // Keep "Select Breed" option
+        if (option.value === '' || option.value === 'other') {
+          option.style.display = 'block'; // Keep "Select Breed" and "Other" options
           continue;
         }
         
@@ -766,6 +816,11 @@
             }
           }
         }
+        // For "other" cattle type, show ALL breeds
+        else if (cattleType === 'other') {
+          option.style.display = 'block';
+          hasVisibleOptions = true;
+        }
         // For other cattle types, show exact matches
         else if (cattleType === '' || breedType === cattleType) {
           option.style.display = 'block';
@@ -779,10 +834,10 @@
         }
       }
       
-      // If no breeds found for the selected type, show a message
+      // Update breed description
       const breedDescription = document.getElementById('breedDescription');
-      if (!hasVisibleOptions && cattleType !== '') {
-        breedDescription.textContent = 'No specific breeds available for this type. Please select "Local" or similar.';
+      if (!hasVisibleOptions && cattleType !== '' && cattleType !== 'other') {
+        breedDescription.textContent = 'No specific breeds available for this type. Please select "Local" or "Other".';
         breedDescription.style.color = '#dc3545';
       } else {
         breedDescription.textContent = '';
@@ -815,7 +870,81 @@
       insuranceValidUpto.min = minDate;
     }
 
-    // Event listeners
+    // MAIN FORM SUBMISSION HANDLER
+    document.getElementById('cowForm').addEventListener('submit', function(e) {
+      const cattleTypeSelect = document.getElementById('cattleType');
+      const cattleTypeOtherInput = document.getElementById('cattleTypeOtherInput');
+      const breedSelect = document.getElementById('breedSelect');
+      const breedOtherInput = document.getElementById('breedOtherInput');
+      const dateOfBirth = document.getElementById('dateOfBirth').value;
+      const age = document.getElementById('ageField').value;
+      const weight = document.querySelector('input[name="weight"]').value;
+      
+      // Prepare values for submission
+      let finalCattleType = cattleTypeSelect.value;
+      let finalBreed = breedSelect.value;
+      
+      // If "Other" is selected, use textbox value
+      if (finalCattleType === 'other' && cattleTypeOtherInput.value.trim()) {
+        finalCattleType = cattleTypeOtherInput.value.trim();
+      }
+      
+      if (finalBreed === 'other' && breedOtherInput.value.trim()) {
+        finalBreed = breedOtherInput.value.trim();
+      }
+      
+      // Update the form values before submission (so backend gets correct values)
+      if (cattleTypeSelect.value === 'other' && cattleTypeOtherInput.value.trim()) {
+        // Create a hidden input with the custom value
+        const hiddenCattleType = document.createElement('input');
+        hiddenCattleType.type = 'hidden';
+        hiddenCattleType.name = 'cattle_type';
+        hiddenCattleType.value = finalCattleType;
+        this.appendChild(hiddenCattleType);
+      }
+      
+      if (breedSelect.value === 'other' && breedOtherInput.value.trim()) {
+        // Create a hidden input with the custom value
+        const hiddenBreed = document.createElement('input');
+        hiddenBreed.type = 'hidden';
+        hiddenBreed.name = 'breed';
+        hiddenBreed.value = finalBreed;
+        this.appendChild(hiddenBreed);
+      }
+      
+      // Validate fields
+      if (!finalCattleType || finalCattleType === 'other') {
+        e.preventDefault();
+        alert('Please select or specify Cattle Type');
+        return false;
+      }
+      
+      if (!finalBreed || finalBreed === 'other') {
+        e.preventDefault();
+        alert('Please select or specify Breed');
+        return false;
+      }
+      
+      if (!dateOfBirth || !age || !weight) {
+        e.preventDefault();
+        alert('Please fill in all required fields: Date of Birth, and Weight');
+        return false;
+      }
+      
+      // Validate milk yield for milk-producing cattle
+      const lowerCattleType = finalCattleType.toLowerCase();
+      if ((lowerCattleType.includes('cow') || lowerCattleType.includes('buffalo') || 
+           lowerCattleType.includes('dairy') || lowerCattleType === 'cow' || 
+           lowerCattleType === 'buffalo') && !document.getElementById('milkYieldInput').value) {
+        e.preventDefault();
+        alert('Milk Yield is required for milk-producing cattle');
+        return false;
+      }
+      
+      return true;
+    });
+
+    // Event listeners on page load
     document.addEventListener('DOMContentLoaded', function() {
       // Set maximum date for date of birth to today
       const today = new Date().toISOString().split('T')[0];
@@ -824,45 +953,24 @@
       // Set minimum date for insurance valid upto field
       setInsuranceMinDate();
       
-      // Initialize breed filtering
-      const cattleType = document.getElementById('cattleType').value;
-      filterBreeds(cattleType);
+      // Initialize all toggle functions
+      toggleCattleTypeFields();
+      toggleBreedFields();
+      toggleFields();
       
-      // Add event listener for breed selection change
+      // Add event listeners
+      document.getElementById('cattleType').addEventListener('change', toggleCattleTypeFields);
+      document.getElementById('breedSelect').addEventListener('change', toggleBreedFields);
+      
+      // Add original event listeners
       document.getElementById('breedSelect').addEventListener('change', function() {
         showBreedDescription(this);
       });
       
-      // Add event listener for cattle type change
       document.getElementById('cattleType').addEventListener('change', toggleFields);
     });
 
-    // Enhanced form validation
-    document.getElementById('cowForm').addEventListener('submit', function(e) {
-      const cattleType = document.getElementById('cattleType').value;
-      const breed = document.getElementById('breedSelect').value;
-      const dateOfBirth = document.getElementById('dateOfBirth').value;
-      const age = document.getElementById('ageField').value;
-      const weight = document.querySelector('input[name="weight"]').value;
-      
-      if (!cattleType || !breed || !dateOfBirth || !age || !weight) {
-        e.preventDefault();
-        alert('Please fill in all required fields: Cattle Type, Breed, Date of Birth, and Weight');
-        return false;
-      }
-      
-      // Validate milk yield for milk-producing cattle
-      if ((cattleType === 'cow' || cattleType === 'buffalo') && !document.getElementById('milkYieldInput').value) {
-        e.preventDefault();
-        alert('Milk Yield is required for ' + cattleType + ' type');
-        return false;
-      }
-      
-      return true;
-    });
-  </script>
-
-  <script>
+    // Mobile sidebar functions
     function toggleSubmenu(event) {
       event.preventDefault();
       const submenu = event.target.closest("li").querySelector(".submenu");
@@ -913,6 +1021,10 @@
       });
     });
   </script>
+
+
+
+
   <script>
     // Language translation functions
     function googleTranslateElementInit() {
