@@ -44,7 +44,124 @@
       padding: 20px;
       transition: all 0.3s ease;
     }
+    /* ============================================
+   LANGUAGE TRANSLATION STYLES - COMPLETELY HIDDEN
+   ============================================ */
+
+/* Hide ALL Google Translate elements */
+.goog-te-banner-frame,
+.goog-te-banner,
+.goog-te-banner-wrapper,
+.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight,
+.goog-te-gadget,
+.goog-te-gadget-simple,
+.goog-te-combo,
+.goog-te-menu-value,
+.goog-te-menu-frame,
+.goog-te-menu2,
+.goog-te-spinner-pos,
+#google_translate_element {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    pointer-events: none !important;
+}
+
+/* Prevent iframe from showing */
+iframe.goog-te-banner-frame,
+iframe.goog-te-menu-frame {
+    display: none !important;
+    border: none !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+
+/* Fix body positioning */
+body {
+    top: 0px !important;
+    position: static !important;
+    transform: none !important;
+}
+
+/* Hide the top bar that appears with translation */
+body > .skiptranslate {
+    display: none !important;
+}
+
+/* Language Selector - Our custom buttons only */
+.language-selector {
+    position: fixed;
+    bottom: 20px;
+    left: 250px;
+    z-index: 10000;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    gap: 10px;
+    border: 2px solid var(--primary);
+}
+
+.lang-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.lang-btn.english {
+    background: var(--primary);
+    color: white;
+}
+
+.lang-btn.kannada {
+    background: #ffc107;
+    color: var(--dark);
+}
+
+.lang-btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+}
+
+.lang-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Mobile responsive for language selector */
+@media (max-width: 768px) {
+    .language-selector {
+        bottom: 90px;
+        right: 10px;
+        left: auto;
+        padding: 6px 10px;
+    }
     
+    .lang-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
     .header {
       background-color: white;
       padding: 15px 20px;
@@ -467,91 +584,132 @@
         height: 40px;
       }
     }
-     /* Language Selector Styles - BOTTOM */
+     /* ============================================
+   LANGUAGE TRANSLATION STYLES FOR FARMER DASHBOARD
+   ============================================ */
+
+/* Language Selector */
+.language-selector {
+    position: fixed;
+    bottom: 20px; /* Adjusted to be above chatbot icon */
+    left: 250px;
+    z-index: 10000;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    gap: 10px;
+    border: 2px solid var(--primary);
+}
+
+.lang-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.lang-btn.english {
+    background: var(--primary);
+    color: white;
+}
+
+.lang-btn.kannada {
+    background: #ffc107;
+    color: var(--dark);
+}
+
+.lang-btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+}
+
+.lang-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Google Translate Widget Styling */
+#google_translate_element {
+    position: fixed !important;
+    top: 70px !important;
+    right: 20px !important;
+    z-index: 9999 !important;
+    background: white !important;
+    padding: 5px 10px !important;
+    border-radius: 5px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    display: block !important;
+    border: 1px solid var(--primary) !important;
+}
+
+.goog-te-gadget {
+    font-size: 12px !important;
+}
+
+.goog-te-gadget-simple {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+.goog-te-menu-value span {
+    color: var(--primary) !important;
+    font-weight: bold !important;
+}
+
+/* Hide Google Translate UI elements */
+.goog-te-banner-frame,
+.goog-te-banner,
+.goog-te-banner-wrapper,
+.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+}
+
+/* Prevent body shift */
+body {
+    top: 0px !important;
+    position: static !important;
+}
+
+/* Hide the translation menu if it appears */
+.goog-te-menu-frame {
+    display: none !important;
+}
+
+/* Mobile responsive for language selector */
+@media (max-width: 768px) {
     .language-selector {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 10000;
-        background: white;
-        padding: 10px 15px;
-        border-radius: 25px;
-        box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-        display: flex;
-        gap: 10px;
-        border: 2px solid #27ae60;
+        bottom: 90px; /* Adjusted for mobile */
+        right: 10px;
+        padding: 6px 10px;
     }
-
+    
     .lang-btn {
-        padding: 8px 20px;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .lang-btn.english {
-        background: #007bff;
-        color: white;
-    }
-
-    .lang-btn.kannada {
-        background: #ff9800;
-        color: white;
-    }
-
-    .lang-btn.active {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
-    }
-
-    /* Hide Google banner */
-    .goog-te-banner-frame { display: none !important; }
-    body { top: 0 !important; }
-
-    /* Mobile responsive */
-    @media (max-width: 768px) {
-        .language-selector {
-            bottom: 10px;
-            right: 10px;
-            padding: 6px 10px;
-        }
-        
-        .lang-btn {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-    }
-    /* Completely hide ALL Google Translate elements */
-    .goog-te-banner-frame,
-    .goog-te-banner,
-    .goog-te-banner-wrapper,
-    .skiptranslate,
-    #goog-gt-tt,
-    .goog-te-balloon-frame,
-    .goog-tooltip,
-    .goog-tooltip:hover,
-    .goog-text-highlight {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        width: 0 !important;
-        position: absolute !important;
+        padding: 5px 10px;
+        font-size: 12px;
     }
     
-    /* Prevent body shift */
-    body {
-        top: 0px !important;
-        position: static !important;
+    #google_translate_element {
+        bottom: 70px !important;
+        right: 10px !important;
+        padding: 4px 8px !important;
     }
-    
-    /* Hide the translation menu if it appears */
-    .goog-te-menu-frame {
-        display: none !important;
-    }
+}
   </style>
 </head>
 <body class="cow-background">
@@ -936,164 +1094,251 @@
       </div>
     </div>
   </div>
+<!-- Add this right before your existing language script -->
+<!-- Language Selector -->
+<div class="language-selector">
+    <button class="lang-btn english active" onclick="setLanguage('en')">
+        <i class="fas fa-globe-americas"></i> English
+    </button>
+    <button class="lang-btn kannada" onclick="setLanguage('kn')">
+        <i class="fas fa-globe-asia"></i> ಕನ್ನಡ
+    </button>
+</div>
 
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display: none;"></div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
+ <script>
+    // ============================================
+    // LANGUAGE MANAGEMENT SYSTEM FOR FARMER DASHBOARD
+    // ============================================
+    
+    // 1. Function to save language preference
+    function saveLanguagePreference(lang) {
+        localStorage.setItem('selectedLanguage', lang);
+        document.cookie = `user_language=${lang}; path=/; max-age=31536000`;
+        sessionStorage.setItem('selectedLanguage', lang);
+    }
+    
+    // 2. Function to apply language translation
+    function applyLanguage(lang) {
+        if (lang === 'kn') {
+            // Kannada translation
+            window.location.hash = '#googtrans(kn|en)';
+            
+            // Force Google Translate to apply
+            setTimeout(function() {
+                if (window.google && google.translate && google.translate.TranslateElement) {
+                    try {
+                        // This triggers the translation
+                        var select = document.querySelector('.goog-te-combo');
+                        if (select) {
+                            select.value = 'kn';
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    } catch(e) {
+                        console.log('Kannada translation applied');
+                    }
+                }
+            }, 500);
+        } else {
+            // English (default)
+            window.location.hash = '#googtrans(en)';
+            
+            setTimeout(function() {
+                if (window.google && google.translate && google.translate.TranslateElement) {
+                    try {
+                        var select = document.querySelector('.goog-te-combo');
+                        if (select) {
+                            select.value = 'en';
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    } catch(e) {
+                        console.log('English translation applied');
+                    }
+                }
+            }, 500);
+        }
+    }
+    
+    // 3. Main language switching function
+    function setLanguage(lang) {
+        // Update button UI
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Save the preference
+        saveLanguagePreference(lang);
+        
+        // Apply immediately
+        applyLanguage(lang);
+        
+        // Show confirmation
+        if (lang === 'kn') {
+            alert('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
+        } else {
+            alert('Language changed to English');
+        }
+    }
+    
+    // 4. Initialize Google Translate
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,kn',
+            layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+            autoDisplay: false,
+            disableAutoTranslation: false
+        }, 'google_translate_element');
+        
+        // Hide the Google Translate widget immediately
+        setTimeout(function() {
+            // Hide all Google Translate elements
+            var elements = document.querySelectorAll('.goog-te-banner, .skiptranslate, .goog-te-gadget');
+            elements.forEach(function(el) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.height = '0';
+                el.style.overflow = 'hidden';
+            });
+            
+            // Fix body position
+            document.body.style.top = '0';
+        }, 100);
+    }
+    
+    // 5. Load Google Translate script
+    function loadGoogleTranslate() {
+        // Check if already loaded
+        if (window.google && google.translate) {
+            googleTranslateElementInit();
+            return;
+        }
+        
+        // Load the script
+        var script = document.createElement('script');
+        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        script.type = 'text/javascript';
+        document.head.appendChild(script);
+    }
+    
+    // ============================================
+    // YOUR EXISTING DASHBOARD FUNCTIONS
+    // ============================================
+    
     // Simple animation for cards on page load
     document.addEventListener('DOMContentLoaded', function() {
-      const cards = document.querySelectorAll('.card');
-      cards.forEach((card, index) => {
-        setTimeout(() => {
-          card.style.opacity = 1;
-          card.style.transform = 'translateY(0)';
-        }, 100 * index);
-      });
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = 1;
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
     });
 
     function toggleSubmenu(event) {
-      event.preventDefault();
-      const submenu = event.target.closest("li").querySelector(".submenu");
-      submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+        event.preventDefault();
+        const submenu = event.target.closest("li").querySelector(".submenu");
+        submenu.style.display = submenu.style.display === "block" ? "none" : "block";
     }
 
     // Profile Modal Functions
     function toggleEditMode() {
-      const viewProfile = document.getElementById('viewProfile');
-      const editProfile = document.getElementById('editProfile');
-      const editBtn = document.getElementById('editProfileBtn');
-      const saveBtn = document.getElementById('saveProfileBtn');
-      const cancelBtn = document.getElementById('cancelEditBtn');
+        const viewProfile = document.getElementById('viewProfile');
+        const editProfile = document.getElementById('editProfile');
+        const editBtn = document.getElementById('editProfileBtn');
+        const saveBtn = document.getElementById('saveProfileBtn');
+        const cancelBtn = document.getElementById('cancelEditBtn');
 
-      if (viewProfile.style.display !== 'none') {
-        // Switch to edit mode
-        viewProfile.style.display = 'none';
-        editProfile.style.display = 'block';
-        editBtn.style.display = 'none';
-        saveBtn.style.display = 'inline-block';
-        cancelBtn.style.display = 'inline-block';
-      } else {
-        // Switch back to view mode
-        viewProfile.style.display = 'block';
-        editProfile.style.display = 'none';
-        editBtn.style.display = 'inline-block';
-        saveBtn.style.display = 'none';
-        cancelBtn.style.display = 'none';
-      }
+        if (viewProfile.style.display !== 'none') {
+            // Switch to edit mode
+            viewProfile.style.display = 'none';
+            editProfile.style.display = 'block';
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'inline-block';
+        } else {
+            // Switch back to view mode
+            viewProfile.style.display = 'block';
+            editProfile.style.display = 'none';
+            editBtn.style.display = 'inline-block';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+        }
     }
 
     function previewProfilePhoto(event) {
-      const input = event.target;
-      const editProfileImg = document.getElementById('editProfileImg');
-      const editProfilePlaceholder = document.getElementById('editProfilePlaceholder');
+        const input = event.target;
+        const editProfileImg = document.getElementById('editProfileImg');
+        const editProfilePlaceholder = document.getElementById('editProfilePlaceholder');
 
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        
-        // Check file size (5MB limit)
-        if (file.size > 5 * 1024 * 1024) {
-          alert('File size too large! Please select an image smaller than 5MB.');
-          input.value = '';
-          return;
-        }
-        
-        // Check file type
-        if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
-          alert('Please select a JPEG or PNG image!');
-          input.value = '';
-          return;
-        }
-        
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          if (editProfileImg) {
-            editProfileImg.src = e.target.result;
-          } else {
-            // Create image element if placeholder exists
-            if (editProfilePlaceholder) {
-              editProfilePlaceholder.style.display = 'none';
-              const newImg = document.createElement('img');
-              newImg.id = 'editProfileImg';
-              newImg.className = 'profile-modal-img';
-              newImg.src = e.target.result;
-              newImg.alt = 'Profile Photo';
-              editProfilePlaceholder.parentNode.insertBefore(newImg, editProfilePlaceholder);
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size too large! Please select an image smaller than 5MB.');
+                input.value = '';
+                return;
             }
-          }
+            
+            // Check file type
+            if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                alert('Please select a JPEG or PNG image!');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                if (editProfileImg) {
+                    editProfileImg.src = e.target.result;
+                } else {
+                    // Create image element if placeholder exists
+                    if (editProfilePlaceholder) {
+                        editProfilePlaceholder.style.display = 'none';
+                        const newImg = document.createElement('img');
+                        newImg.id = 'editProfileImg';
+                        newImg.className = 'profile-modal-img';
+                        newImg.src = e.target.result;
+                        newImg.alt = 'Profile Photo';
+                        editProfilePlaceholder.parentNode.insertBefore(newImg, editProfilePlaceholder);
+                    }
+                }
+            }
+            
+            reader.readAsDataURL(file);
         }
-        
-        reader.readAsDataURL(file);
-      }
     }
 
     async function saveProfile() {
-      const form = document.getElementById('profileForm');
-      const formData = new FormData(form);
+        const form = document.getElementById('profileForm');
+        const formData = new FormData(form);
 
-      try {
-        const response = await fetch('/update_profile', {
-          method: 'POST',
-          body: formData
-        });
+        try {
+            const response = await fetch('/update_profile', {
+                method: 'POST',
+                body: formData
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if (result.success) {
-          alert('Profile updated successfully!');
-          toggleEditMode();
-          location.reload(); // Reload to show updated data
-        } else {
-          alert('Error updating profile: ' + result.message);
+            if (result.success) {
+                alert('Profile updated successfully!');
+                toggleEditMode();
+                location.reload(); // Reload to show updated data
+            } else {
+                alert('Error updating profile: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating profile. Please try again.');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error updating profile. Please try again.');
-      }
     }
-
-    // Toggle mobile sidebar
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const overlay = document.getElementById('overlay');
-    
-    menuToggle.addEventListener('click', function() {
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
-      
-      // Change icon based on sidebar state
-      const icon = menuToggle.querySelector('i');
-      if (sidebar.classList.contains('active')) {
-        icon.classList.remove('fa-bars');
-        icon.classList.add('fa-times');
-      } else {
-        icon.classList.remove('fa-times');
-        icon.classList.add('fa-bars');
-      }
-    });
-    
-    // Close sidebar when clicking on overlay
-    overlay.addEventListener('click', function() {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-      const icon = menuToggle.querySelector('i');
-      icon.classList.remove('fa-times');
-      icon.classList.add('fa-bars');
-    });
-    
-    // Close sidebar when clicking on a nav link (mobile)
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.addEventListener('click', function() {
-        if (window.innerWidth <= 768) {
-          sidebar.classList.remove('active');
-          overlay.classList.remove('active');
-          const icon = menuToggle.querySelector('i');
-          icon.classList.remove('fa-times');
-          icon.classList.add('fa-bars');
-        }
-      });
-    });
 
     // Chatbot functionality
     let recognition;
@@ -1103,223 +1348,239 @@
 
     // Toggle chatbot visibility
     document.getElementById("chatbot-icon").addEventListener("click", function() {
-      const popup = document.getElementById("chatbot-popup");
-      if (isChatbotOpen) {
-        popup.style.display = "none";
-      } else {
-        popup.style.display = "flex";
-        // Add welcome message when opening
-        addMessage("bot", "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ. ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?");
-      }
-      isChatbotOpen = !isChatbotOpen;
+        const popup = document.getElementById("chatbot-popup");
+        if (isChatbotOpen) {
+            popup.style.display = "none";
+        } else {
+            popup.style.display = "flex";
+            // Add welcome message when opening
+            addMessage("bot", "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ. ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?");
+        }
+        isChatbotOpen = !isChatbotOpen;
     });
 
     // Close chatbot
     document.getElementById("close-chatbot").addEventListener("click", function() {
-      document.getElementById("chatbot-popup").style.display = "none";
-      isChatbotOpen = false;
+        document.getElementById("chatbot-popup").style.display = "none";
+        isChatbotOpen = false;
     });
 
     // Toggle text input
     document.getElementById("textInputBtn").addEventListener("click", function() {
-      const textInputContainer = document.getElementById("text-input-container");
-      if (textInputContainer.style.display === "none") {
-        textInputContainer.style.display = "block";
-      } else {
-        textInputContainer.style.display = "none";
-      }
+        const textInputContainer = document.getElementById("text-input-container");
+        if (textInputContainer.style.display === "none") {
+            textInputContainer.style.display = "block";
+        } else {
+            textInputContainer.style.display = "none";
+        }
     });
 
     // Send text message
     document.getElementById("send-text-btn").addEventListener("click", function() {
-      const textInput = document.getElementById("text-input");
-      const message = textInput.value.trim();
-      if (message) {
-        addMessage("user", message);
-        textInput.value = "";
-        processMessage(message);
-      }
+        const textInput = document.getElementById("text-input");
+        const message = textInput.value.trim();
+        if (message) {
+            addMessage("user", message);
+            textInput.value = "";
+            processMessage(message);
+        }
     });
 
     // Clear chat button functionality
     document.getElementById("clear-chat-btn").addEventListener("click", function() {
-      document.getElementById("chat-log").innerHTML = "";
+        document.getElementById("chat-log").innerHTML = "";
     });
 
     // Enter key to send text message
     document.getElementById("text-input").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        document.getElementById("send-text-btn").click();
-      }
+        if (e.key === "Enter") {
+            document.getElementById("send-text-btn").click();
+        }
     });
 
     // Add message to chat log
     function addMessage(sender, text) {
-      const chatLog = document.getElementById("chat-log");
-      const messageDiv = document.createElement("div");
-      messageDiv.innerHTML = `<b>${sender === "user" ? "ನೀವು" : "ಸಹಾಯಕ"}:</b> ${text}<br>`;
-      chatLog.appendChild(messageDiv);
-      chatLog.scrollTop = chatLog.scrollHeight;
+        const chatLog = document.getElementById("chat-log");
+        const messageDiv = document.createElement("div");
+        messageDiv.innerHTML = `<b>${sender === "user" ? "ನೀವು" : "ಸಹಾಯಕ"}:</b> ${text}<br>`;
+        chatLog.appendChild(messageDiv);
+        chatLog.scrollTop = chatLog.scrollHeight;
     }
 
     // Process message and get response
     async function processMessage(message) {
-      try {
-        const res = await fetch("/chatbot", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: message, lang: currentLang })
-        });
-        const data = await res.json();
-        addMessage("bot", data.reply);
-        speakText(data.reply);
-      } catch (error) {
-        console.error("Error:", error);
-        addMessage("bot", "ಕ್ಷಮಿಸಿ, ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆ ಉಂಟಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
-      }
+        try {
+            const res = await fetch("/chatbot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: message, lang: currentLang })
+            });
+            const data = await res.json();
+            addMessage("bot", data.reply);
+            speakText(data.reply);
+        } catch (error) {
+            console.error("Error:", error);
+            addMessage("bot", "ಕ್ಷಮಿಸಿ, ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆ ಉಂಟಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
+        }
     }
 
     // Speak text using browser's speech synthesis
     function speakText(text) {
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'kn-IN';
-        speechSynthesis.speak(utterance);
-      }
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'kn-IN';
+            speechSynthesis.speak(utterance);
+        }
     }
 
     // 🎙️ Setup Speech Recognition
     if ("webkitSpeechRecognition" in window) {
-      recognition = new webkitSpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = "kn-IN"; // Kannada by default
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "kn-IN"; // Kannada by default
 
-      recognition.onstart = function() {
-        isListening = true;
-        document.getElementById("recordBtn").innerHTML = '<i class="fas fa-circle"></i> Listening...';
-        document.getElementById("recordBtn").classList.add("btn-danger");
-        document.getElementById("recordBtn").classList.remove("btn-success");
-      };
+        recognition.onstart = function() {
+            isListening = true;
+            document.getElementById("recordBtn").innerHTML = '<i class="fas fa-circle"></i> Listening...';
+            document.getElementById("recordBtn").classList.add("btn-danger");
+            document.getElementById("recordBtn").classList.remove("btn-success");
+        };
 
-      recognition.onend = function() {
-        isListening = false;
-        document.getElementById("recordBtn").innerHTML = '<i class="fas fa-microphone"></i> ಮಾತನಾಡಿ';
-        document.getElementById("recordBtn").classList.remove("btn-danger");
-        document.getElementById("recordBtn").classList.add("btn-success");
-      };
+        recognition.onend = function() {
+            isListening = false;
+            document.getElementById("recordBtn").innerHTML = '<i class="fas fa-microphone"></i> ಮಾತನಾಡಿ';
+            document.getElementById("recordBtn").classList.remove("btn-danger");
+            document.getElementById("recordBtn").classList.add("btn-success");
+        };
 
-      recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        addMessage("user", transcript);
-        processMessage(transcript);
-      };
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            addMessage("user", transcript);
+            processMessage(transcript);
+        };
 
-      recognition.onerror = function(event) {
-        console.error("Speech recognition error", event.error);
-        addMessage("bot", "ಕ್ಷಮಿಸಿ, ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ಗುರುತಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
-        isListening = false;
-        document.getElementById("recordBtn").innerHTML = '<i class="fas fa-microphone"></i> ಮಾತನಾಡಿ';
-        document.getElementById("recordBtn").classList.remove("btn-danger");
-        document.getElementById("recordBtn").classList.add("btn-success");
-      };
+        recognition.onerror = function(event) {
+            console.error("Speech recognition error", event.error);
+            addMessage("bot", "ಕ್ಷಮಿಸಿ, ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ಗುರುತಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
+            isListening = false;
+            document.getElementById("recordBtn").innerHTML = '<i class="fas fa-microphone"></i> ಮಾತನಾಡಿ';
+            document.getElementById("recordBtn").classList.remove("btn-danger");
+            document.getElementById("recordBtn").classList.add("btn-success");
+        };
     } else {
-      // Browser doesn't support speech recognition
-      document.getElementById("recordBtn").disabled = true;
-      document.getElementById("recordBtn").innerHTML = '<i class="fas fa-microphone-slash"></i> Not Supported';
+        // Browser doesn't support speech recognition
+        document.getElementById("recordBtn").disabled = true;
+        document.getElementById("recordBtn").innerHTML = '<i class="fas fa-microphone-slash"></i> Not Supported';
     }
 
     document.getElementById("recordBtn").addEventListener("click", function() {
-      if (isListening) {
-        recognition.stop();
-      } else {
-        recognition.start();
-      }
+        if (isListening) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
     });
-  </script>
-  <script>
-    // Language translation functions
-    function googleTranslateElementInit() {
-        if (typeof google !== 'undefined' && google.translate) {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,kn',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
-            
-            const savedLang = localStorage.getItem('selectedLanguage');
-            if(savedLang === 'kn') {
-                setTimeout(() => applyKannada(), 1000);
-            }
-        }
-    }
 
-    window.onload = function() {
-        if (typeof google !== 'undefined' && google.translate) {
-            googleTranslateElementInit();
+    // Toggle mobile sidebar
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const overlay = document.getElementById('overlay');
+    
+    menuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        
+        // Change icon based on sidebar state
+        const icon = menuToggle.querySelector('i');
+        if (sidebar.classList.contains('active')) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
         } else {
-            var script = document.createElement('script');
-            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-            document.body.appendChild(script);
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
         }
-        
-        const savedLang = localStorage.getItem('selectedLanguage');
-        if(savedLang === 'kn') {
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.lang-btn.kannada').classList.add('active');
-            setTimeout(() => applyKannada(), 2000);
-        }
-    };
-
-    function applyKannada() {
-        var iframe = document.querySelector('.goog-te-menu-frame');
-        if(iframe && iframe.contentDocument) {
-            var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
-            if(select) {
-                select.value = 'kn';
-                select.dispatchEvent(new Event('change'));
-                return true;
+    });
+    
+    // Close sidebar when clicking on overlay
+    overlay.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        const icon = menuToggle.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+    });
+    
+    // Close sidebar when clicking on a nav link (mobile)
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                const icon = menuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
             }
-        }
-        
-        var elements = document.querySelectorAll('.goog-te-menu2-select');
-        if(elements.length > 0) {
-            elements[0].value = 'kn';
-            elements[0].dispatchEvent(new Event('change'));
-            return true;
-        }
-        
-        return false;
-    }
+        });
+    });
 
-    function setLanguage(lang) {
-        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        localStorage.setItem('selectedLanguage', lang);
+    // ============================================
+    // MAIN INITIALIZATION
+    // ============================================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load Google Translate
+        loadGoogleTranslate();
         
-        if(lang === 'kn') {
-            window.location.hash = '#googtrans(kn)';
-            if(applyKannada()) {
-                console.log('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
-            } else {
-                setTimeout(() => location.reload(), 500);
+        // Check for saved language preference
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        
+        // Set active button
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if ((savedLang === 'en' && btn.classList.contains('english')) || 
+                (savedLang === 'kn' && btn.classList.contains('kannada'))) {
+                btn.classList.add('active');
             }
-        } else {
-            window.location.hash = '#googtrans(en)';
-            var iframe = document.querySelector('.goog-te-menu-frame');
-            if(iframe && iframe.contentDocument) {
-                var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
-                if(select) {
-                    select.value = 'en';
-                    select.dispatchEvent(new Event('change'));
-                    console.log('Language changed to English');
-                    return;
+        });
+        
+        // Apply saved language after a short delay
+        setTimeout(function() {
+            applyLanguage(savedLang);
+        }, 1000);
+        
+        // Add language parameter to all links
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !href.includes('#') && href !== '#' && !href.includes('javascript:')) {
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                const separator = href.includes('?') ? '&' : '?';
+                link.href = href + separator + 'lang=' + lang;
+            }
+        });
+        
+        // Setup speech recognition
+        if (recognition) {
+            document.getElementById("recordBtn").addEventListener("click", function() {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
                 }
-            }
-            setTimeout(() => location.reload(), 500);
+            });
         }
-    }
+        
+        // Card animations on load
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = 1;
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    });
 </script>
 </body>
 </html>
