@@ -256,7 +256,15 @@ def init_db():
             cattle_type TEXT NOT NULL,
             description TEXT
         )""")
-
+# Add OTP table for password reset
+        cursor.execute("""CREATE TABLE IF NOT EXISTS password_reset_otp (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            phone TEXT NOT NULL,
+            otp TEXT NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
+            verified BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )""")
         # Insert some sample breeds
         # In your init_db() function, replace the sample_breeds section with this:
 
@@ -408,6 +416,71 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+
+import random
+from datetime import datetime, timedelta
+
+def generate_otp():
+    """Generate a 4-digit OTP"""
+    return str(random.randint(1000, 9999))
+
+def save_otp(phone, otp):
+    """Save OTP to database with 10-minute expiration"""
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # Expire any existing OTPs for this phone
+    cursor.execute("UPDATE password_reset_otp SET verified = 1 WHERE phone = ?", (phone,))
+    
+    # Calculate expiration time (10 minutes from now)
+    expires_at = datetime.now() + timedelta(minutes=10)
+    
+    # Save new OTP
+    cursor.execute("""
+        INSERT INTO password_reset_otp (phone, otp, expires_at) 
+        VALUES (?, ?, ?)
+    """, (phone, otp, expires_at.isoformat()))
+    
+    conn.commit()
+    conn.close()
+
+def verify_otp(phone, otp):
+    """Verify OTP is valid and not expired"""
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT * FROM password_reset_otp 
+        WHERE phone = ? AND otp = ? AND verified = 0 
+        AND expires_at > datetime('now')
+    """, (phone, otp))
+    
+    otp_record = cursor.fetchone()
+    
+    if otp_record:
+        # Mark OTP as verified
+        cursor.execute("UPDATE password_reset_otp SET verified = 1 WHERE id = ?", (otp_record['id'],))
+        conn.commit()
+        conn.close()
+        return True
+    
+    conn.close()
+    return False
+
+def update_password(phone, new_password):
+    """Update farmer's password in database"""
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE farmers SET password = ? WHERE phone = ?", (new_password, phone))
+    
+    if cursor.rowcount > 0:
+        conn.commit()
+        conn.close()
+        return True
+    
+    conn.close()
+    return False
 
 # Add these functions for language support
 @app.context_processor
@@ -1599,6 +1672,232 @@ def login():
         else:
             flash("Invalid credentials!")
     return render_template("login.html")
+
+
+
+
+
+
+#Forgot Password
+
+@app.route("/forgot_password_modal", methods=["POST"])
+def forgot_password_modal():
+    """Handle forgot password from modal - Step 1: Send OTP"""
+    phone = request.form.get("phone")
+    
+    if not phone:
+        return jsonify({"success": False, "message": "Phone number is required"})
+    
+    # Check if phone exists in database
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM farmers WHERE phone = ?", (phone,))
+    farmer = cursor.fetchone()
+    conn.close()
+    
+    if not farmer:
+        return jsonify({"success": False, "message": "Phone number not registered!"})
+    
+    # Generate and send OTP
+    otp = generate_otp()
+    save_otp(phone, otp)
+    
+    # Send OTP via SMS
+    message = f"Your Kamadhenu password reset OTP is: {otp}. Valid for 10 minutes."
+    sms_result = send_sms(phone, message)
+    
+    if sms_result['success']:
+        # Store phone in session for verification
+        session['reset_phone'] = phone
+        return jsonify({"success": True, "message": f"OTP sent to {phone}", "phone": phone})
+    else:
+        return jsonify({"success": False, "message": "Failed to send OTP. Please try again."})
+
+@app.route("/verify_otp_modal", methods=["POST"])
+def verify_otp_modal():
+    """Handle OTP verification from modal - Step 2: Verify OTP"""
+    phone = session.get('reset_phone')
+    otp = request.form.get("otp")
+    
+    if not phone or not otp:
+        return jsonify({"success": False, "message": "Invalid request"})
+    
+    if verify_otp(phone, otp):
+        session['otp_verified'] = True
+        return jsonify({"success": True, "message": "OTP verified successfully!"})
+    else:
+        return jsonify({"success": False, "message": "Invalid or expired OTP!"})
+
+@app.route("/reset_password_modal", methods=["POST"])
+def reset_password_modal():
+    """Handle password reset from modal - Step 3: Reset password"""
+    phone = session.get('reset_phone')
+    new_password = request.form.get("new_password")
+    confirm_password = request.form.get("confirm_password")
+    
+    # Check if OTP was verified
+    if not session.get('otp_verified'):
+        return jsonify({"success": False, "message": "Please verify OTP first"})
+    
+    if not phone or not new_password:
+        return jsonify({"success": False, "message": "Invalid request"})
+    
+    if new_password != confirm_password:
+        return jsonify({"success": False, "message": "Passwords do not match!"})
+    
+    if len(new_password) < 6:
+        return jsonify({"success": False, "message": "Password must be at least 6 characters!"})
+    
+    # Update password
+    if update_password(phone, new_password):
+        # Clear session data
+        session.pop('reset_phone', None)
+        session.pop('otp_verified', None)
+        return jsonify({"success": True, "message": "Password reset successfully! Please login."})
+    else:
+        return jsonify({"success": False, "message": "Failed to reset password"})
+
+@app.route("/resend_otp_modal", methods=["POST"])
+def resend_otp_modal():
+    """Resend OTP from modal"""
+    phone = session.get('reset_phone')
+    
+    if not phone:
+        return jsonify({"success": False, "message": "Phone number not found in session"})
+    
+    # Generate and send new OTP
+    otp = generate_otp()
+    save_otp(phone, otp)
+    
+    # Send OTP via SMS
+    message = f"Your Kamadhenu password reset OTP is: {otp}. Valid for 10 minutes."
+    sms_result = send_sms(phone, message)
+    
+    if sms_result['success']:
+        return jsonify({"success": True, "message": f"New OTP sent to {phone}"})
+    else:
+        return jsonify({"success": False, "message": "Failed to resend OTP"})
+
+# Add to your existing OTP functions
+def update_vet_password(phone, new_password):
+    """Update vet's password in database"""
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE veterinarians SET password = ? WHERE phone = ?", (new_password, phone))
+    
+    if cursor.rowcount > 0:
+        conn.commit()
+        conn.close()
+        return True
+    
+    conn.close()
+    return False
+
+
+@app.route("/vet/forgot_password_modal", methods=["POST"])
+def vet_forgot_password_modal():
+    """Handle vet forgot password from modal - Step 1: Send OTP"""
+    phone = request.form.get("phone")
+    
+    if not phone:
+        return jsonify({"success": False, "message": "Phone number is required"})
+    
+    # Check if phone exists in vet database
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM veterinarians WHERE phone = ?", (phone,))
+    vet = cursor.fetchone()
+    conn.close()
+    
+    if not vet:
+        return jsonify({"success": False, "message": "Phone number not registered!"})
+    
+    # Generate and send OTP
+    otp = generate_otp()
+    save_otp(phone, otp)
+    
+    # Send OTP via SMS
+    message = f"Your Kamadhenu Vet password reset OTP is: {otp}. Valid for 10 minutes."
+    sms_result = send_sms(phone, message)
+    
+    if sms_result['success']:
+        # Store phone in session for verification
+        session['vet_reset_phone'] = phone
+        return jsonify({"success": True, "message": f"OTP sent to {phone}", "phone": phone})
+    else:
+        return jsonify({"success": False, "message": "Failed to send OTP. Please try again."})
+
+@app.route("/vet/verify_otp_modal", methods=["POST"])
+def vet_verify_otp_modal():
+    """Handle vet OTP verification from modal - Step 2: Verify OTP"""
+    phone = session.get('vet_reset_phone')
+    otp = request.form.get("otp")
+    
+    if not phone or not otp:
+        return jsonify({"success": False, "message": "Invalid request"})
+    
+    if verify_otp(phone, otp):
+        session['vet_otp_verified'] = True
+        return jsonify({"success": True, "message": "OTP verified successfully!"})
+    else:
+        return jsonify({"success": False, "message": "Invalid or expired OTP!"})
+
+@app.route("/vet/reset_password_modal", methods=["POST"])
+def vet_reset_password_modal():
+    """Handle vet password reset from modal - Step 3: Reset password"""
+    phone = session.get('vet_reset_phone')
+    new_password = request.form.get("new_password")
+    confirm_password = request.form.get("confirm_password")
+    
+    # Check if OTP was verified
+    if not session.get('vet_otp_verified'):
+        return jsonify({"success": False, "message": "Please verify OTP first"})
+    
+    if not phone or not new_password:
+        return jsonify({"success": False, "message": "Invalid request"})
+    
+    if new_password != confirm_password:
+        return jsonify({"success": False, "message": "Passwords do not match!"})
+    
+    if len(new_password) < 6:
+        return jsonify({"success": False, "message": "Password must be at least 6 characters!"})
+    
+    # Update password
+    if update_vet_password(phone, new_password):
+        # Clear session data
+        session.pop('vet_reset_phone', None)
+        session.pop('vet_otp_verified', None)
+        return jsonify({"success": True, "message": "Password reset successfully! Please login."})
+    else:
+        return jsonify({"success": False, "message": "Failed to reset password"})
+
+@app.route("/vet/resend_otp_modal", methods=["POST"])
+def vet_resend_otp_modal():
+    """Resend OTP for vet from modal"""
+    phone = session.get('vet_reset_phone')
+    
+    if not phone:
+        return jsonify({"success": False, "message": "Phone number not found in session"})
+    
+    # Generate and send new OTP
+    otp = generate_otp()
+    save_otp(phone, otp)
+    
+    # Send OTP via SMS
+    message = f"Your Kamadhenu Vet password reset OTP is: {otp}. Valid for 10 minutes."
+    sms_result = send_sms(phone, message)
+    
+    if sms_result['success']:
+        return jsonify({"success": True, "message": f"New OTP sent to {phone}"})
+    else:
+        return jsonify({"success": False, "message": "Failed to resend OTP"})
+
+
+
+
+
+
 
 # ---------------- Dashboard ----------------
 @app.route("/dashboard")
@@ -4115,6 +4414,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
