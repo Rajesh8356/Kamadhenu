@@ -399,6 +399,20 @@
       <h2><i class="fas fa-user-plus me-2"></i>Farmer Registration</h2>
       <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
         <!-- Photo Upload Section -->
+                 <!-- Error/Success Messages -->
+{% if session.get('register_error') %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ session.pop('register_error') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
+{% if session.get('register_success') %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ session.pop('register_success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
         <div class="mb-3">
           <label class="form-label">Profile Photo</label>
           <div class="photo-upload-area" onclick="document.getElementById('photo').click()">
@@ -720,4 +734,5 @@
     }
 </script>
 </body>
+
 </html>
