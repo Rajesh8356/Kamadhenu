@@ -1928,6 +1928,7 @@ def vet_resend_otp_modal():
 # ---------------- Dashboard ----------------
 @app.route("/dashboard")
 def dashboard():
+    lang = request.args.get('lang', 'en')
     if "farmer_id" not in session:
         return redirect(url_for("login"))
 
@@ -3226,6 +3227,7 @@ from datetime import date as dt_date  # Already imported
 
 @app.route("/vet/dashboard")
 def vet_dashboard():
+    lang = request.args.get('lang', 'en')
     if "vet_id" not in session:
         flash("Please login first!", "danger")
         return redirect(url_for("vet_login"))
@@ -4440,6 +4442,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
