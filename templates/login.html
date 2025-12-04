@@ -349,8 +349,84 @@
         <button type="submit" class="btn btn-custom">Login</button>
       </form>
       <div class="extra-links">
-        <p>Don't have an account? <a href="/register">Register here</a></p>
+  <p>Don't have an account? <a href="/register">Register here</a></p>
+  <p><a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot Password?</a></p>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="forgotPasswordModalLabel"><i class="fas fa-key me-2"></i>Forgot Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <!-- Step 1: Enter Phone Number -->
+        <div id="step1">
+          <p class="mb-3">Enter your registered phone number to receive OTP</p>
+          <div class="alert alert-danger d-none" id="step1Error"></div>
+          <div class="alert alert-success d-none" id="step1Success"></div>
+          <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-phone"></i></span>
+              <input type="tel" class="form-control" id="resetPhone" placeholder="Enter your phone number">
+            </div>
+          </div>
+          <button type="button" class="btn btn-custom w-100" onclick="sendOTP()">Send OTP</button>
+        </div>
+
+        <!-- Step 2: Verify OTP -->
+        <div id="step2" class="d-none">
+          <p class="mb-3">Enter the 4-digit OTP sent to <span id="phoneDisplay" class="fw-bold"></span></p>
+          <div class="alert alert-danger d-none" id="step2Error"></div>
+          <div class="alert alert-success d-none" id="step2Success"></div>
+          <div class="mb-3">
+            <label class="form-label">OTP</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+              <input type="text" class="form-control" id="otpInput" placeholder="Enter 4-digit OTP" maxlength="4">
+            </div>
+            <div class="mt-2 text-end">
+              <small class="text-muted">Didn't receive OTP? <a href="#" onclick="resendOTP()" id="resendLink">Resend</a></small>
+              <div id="timer" class="text-danger"></div>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary flex-grow-1" onclick="backToStep1()">Back</button>
+            <button type="button" class="btn btn-custom flex-grow-1" onclick="verifyOTP()">Verify OTP</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Reset Password -->
+        <div id="step3" class="d-none">
+          <p class="mb-3">Set your new password</p>
+          <div class="alert alert-danger d-none" id="step3Error"></div>
+          <div class="alert alert-success d-none" id="step3Success"></div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirm Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary flex-grow-1" onclick="backToStep2()">Back</button>
+            <button type="button" class="btn btn-custom flex-grow-1" onclick="resetPassword()">Reset Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 
@@ -462,6 +538,243 @@
             setTimeout(() => location.reload(), 500);
         }
     }
+    let otpTimer;
+let resendTimeout = 60; // 60 seconds
+
+function sendOTP() {
+    const phone = document.getElementById('resetPhone').value.trim();
+    
+    if (!phone) {
+        showError('step1Error', 'Please enter your phone number');
+        return;
+    }
+    
+    // Show loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+    btn.disabled = true;
+    
+    // Send request
+    fetch('/forgot_password_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'phone': phone
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccess('step1Success', data.message);
+            document.getElementById('phoneDisplay').textContent = data.phone;
+            showStep(2);
+            startResendTimer();
+        } else {
+            showError('step1Error', data.message);
+        }
+    })
+    .catch(error => {
+        showError('step1Error', 'An error occurred. Please try again.');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function verifyOTP() {
+    const otp = document.getElementById('otpInput').value.trim();
+    
+    if (!otp || otp.length !== 4) {
+        showError('step2Error', 'Please enter a valid 4-digit OTP');
+        return;
+    }
+    
+    // Show loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...';
+    btn.disabled = true;
+    
+    // Send request
+    fetch('/verify_otp_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'otp': otp
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccess('step2Success', data.message);
+            showStep(3);
+        } else {
+            showError('step2Error', data.message);
+        }
+    })
+    .catch(error => {
+        showError('step2Error', 'An error occurred. Please try again.');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function resetPassword() {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (!newPassword || !confirmPassword) {
+        showError('step3Error', 'Please fill in all fields');
+        return;
+    }
+    
+    // Show loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Resetting...';
+    btn.disabled = true;
+    
+    // Send request
+    fetch('/reset_password_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'new_password': newPassword,
+            'confirm_password': confirmPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccess('step3Success', data.message);
+            setTimeout(() => {
+                location.reload(); // Reload to show login form
+            }, 2000);
+        } else {
+            showError('step3Error', data.message);
+        }
+    })
+    .catch(error => {
+        showError('step3Error', 'An error occurred. Please try again.');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function resendOTP() {
+    const resendLink = document.getElementById('resendLink');
+    if (resendLink.classList.contains('disabled')) return;
+    
+    // Show loading
+    const originalText = resendLink.innerHTML;
+    resendLink.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    
+    fetch('/resend_otp_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccess('step2Success', data.message);
+            startResendTimer();
+        } else {
+            showError('step2Error', data.message);
+        }
+    })
+    .catch(error => {
+        showError('step2Error', 'Failed to resend OTP');
+    })
+    .finally(() => {
+        resendLink.innerHTML = originalText;
+    });
+}
+
+function startResendTimer() {
+    clearInterval(otpTimer);
+    resendTimeout = 60;
+    const resendLink = document.getElementById('resendLink');
+    const timerDisplay = document.getElementById('timer');
+    
+    resendLink.classList.add('disabled');
+    resendLink.style.pointerEvents = 'none';
+    resendLink.style.opacity = '0.5';
+    
+    otpTimer = setInterval(() => {
+        timerDisplay.textContent = `Resend available in ${resendTimeout}s`;
+        resendTimeout--;
+        
+        if (resendTimeout < 0) {
+            clearInterval(otpTimer);
+            timerDisplay.textContent = '';
+            resendLink.classList.remove('disabled');
+            resendLink.style.pointerEvents = 'auto';
+            resendLink.style.opacity = '1';
+        }
+    }, 1000);
+}
+
+function showStep(step) {
+    document.getElementById('step1').classList.add('d-none');
+    document.getElementById('step2').classList.add('d-none');
+    document.getElementById('step3').classList.add('d-none');
+    
+    document.getElementById('step1Error').classList.add('d-none');
+    document.getElementById('step2Error').classList.add('d-none');
+    document.getElementById('step3Error').classList.add('d-none');
+    
+    document.getElementById('step1Success').classList.add('d-none');
+    document.getElementById('step2Success').classList.add('d-none');
+    document.getElementById('step3Success').classList.add('d-none');
+    
+    document.getElementById(`step${step}`).classList.remove('d-none');
+}
+
+function backToStep1() {
+    showStep(1);
+}
+
+function backToStep2() {
+    showStep(2);
+}
+
+function showError(elementId, message) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.classList.remove('d-none');
+}
+
+function showSuccess(elementId, message) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.classList.remove('d-none');
+}
+
+// Reset modal when closed
+document.getElementById('forgotPasswordModal').addEventListener('hidden.bs.modal', function () {
+    showStep(1);
+    document.getElementById('resetPhone').value = '';
+    document.getElementById('otpInput').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    clearInterval(otpTimer);
+    document.getElementById('timer').textContent = '';
+    sessionStorage.removeItem('reset_phone');
+});
 </script>
 </body>
 </html>
