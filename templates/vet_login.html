@@ -349,12 +349,88 @@
         </div>
         <button type="submit" class="btn btn-custom">Login</button>
       </form>
-      <div class="extra-links">
-        <p>Don't have an account? <a href="{{ url_for('vet_register') }}">Register here</a></p>
-      </div>
+     <div class="extra-links">
+  <p>Don't have an account? <a href="{{ url_for('vet_register') }}">Register here</a></p>
+  <p><a href="#" data-bs-toggle="modal" data-bs-target="#vetForgotPasswordModal">Forgot Password?</a></p>
+</div>
     </div>
   </div>
 
+
+  <!-- Vet Forgot Password Modal -->
+<div class="modal fade" id="vetForgotPasswordModal" tabindex="-1" aria-labelledby="vetForgotPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="vetForgotPasswordModalLabel"><i class="fas fa-key me-2"></i>Forgot Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Step 1: Enter Phone Number -->
+        <div id="vetStep1">
+          <p class="mb-3">Enter your registered phone number to receive OTP</p>
+          <div class="alert alert-danger d-none" id="vetStep1Error"></div>
+          <div class="alert alert-success d-none" id="vetStep1Success"></div>
+          <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-phone"></i></span>
+              <input type="tel" class="form-control" id="vetResetPhone" placeholder="Enter your phone number">
+            </div>
+          </div>
+          <button type="button" class="btn btn-custom w-100" onclick="vetSendOTP()">Send OTP</button>
+        </div>
+
+        <!-- Step 2: Verify OTP -->
+        <div id="vetStep2" class="d-none">
+          <p class="mb-3">Enter the 4-digit OTP sent to <span id="vetPhoneDisplay" class="fw-bold"></span></p>
+          <div class="alert alert-danger d-none" id="vetStep2Error"></div>
+          <div class="alert alert-success d-none" id="vetStep2Success"></div>
+          <div class="mb-3">
+            <label class="form-label">OTP</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+              <input type="text" class="form-control" id="vetOtpInput" placeholder="Enter 4-digit OTP" maxlength="4">
+            </div>
+            <div class="mt-2 text-end">
+              <small class="text-muted">Didn't receive OTP? <a href="#" onclick="vetResendOTP()" id="vetResendLink">Resend</a></small>
+              <div id="vetTimer" class="text-danger"></div>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary flex-grow-1" onclick="vetBackToStep1()">Back</button>
+            <button type="button" class="btn btn-custom flex-grow-1" onclick="vetVerifyOTP()">Verify OTP</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Reset Password -->
+        <div id="vetStep3" class="d-none">
+          <p class="mb-3">Set your new password</p>
+          <div class="alert alert-danger d-none" id="vetStep3Error"></div>
+          <div class="alert alert-success d-none" id="vetStep3Success"></div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" id="vetNewPassword" placeholder="Enter new password">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirm Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" id="vetConfirmPassword" placeholder="Confirm new password">
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary flex-grow-1" onclick="vetBackToStep2()">Back</button>
+            <button type="button" class="btn btn-custom flex-grow-1" onclick="vetResetPassword()">Reset Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
   <div class="floating-stethoscope">
     <i class="fas fa-stethoscope"></i>
   </div>
@@ -466,6 +542,246 @@
             setTimeout(() => location.reload(), 500);
         }
     }
+ 
+// Vet Forgot Password Modal Functions
+let vetOtpTimer;
+let vetResendTimeout = 60; // 60 seconds
+
+function vetSendOTP() {
+    const phone = document.getElementById('vetResetPhone').value.trim();
+    
+    if (!phone) {
+        vetShowError('vetStep1Error', 'Please enter your phone number');
+        return;
+    }
+    
+    // Show loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+    btn.disabled = true;
+    
+    // Send request
+    fetch('/vet/forgot_password_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'phone': phone
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            vetShowSuccess('vetStep1Success', data.message);
+            document.getElementById('vetPhoneDisplay').textContent = data.phone;
+            vetShowStep(2);
+            vetStartResendTimer();
+        } else {
+            vetShowError('vetStep1Error', data.message);
+        }
+    })
+    .catch(error => {
+        vetShowError('vetStep1Error', 'An error occurred. Please try again.');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function vetVerifyOTP() {
+    const otp = document.getElementById('vetOtpInput').value.trim();
+    
+    if (!otp || otp.length !== 4) {
+        vetShowError('vetStep2Error', 'Please enter a valid 4-digit OTP');
+        return;
+    }
+    
+    // Show loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...';
+    btn.disabled = true;
+    
+    // Send request
+    fetch('/vet/verify_otp_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'otp': otp
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            vetShowSuccess('vetStep2Success', data.message);
+            vetShowStep(3);
+        } else {
+            vetShowError('vetStep2Error', data.message);
+        }
+    })
+    .catch(error => {
+        vetShowError('vetStep2Error', 'An error occurred. Please try again.');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function vetResetPassword() {
+    const newPassword = document.getElementById('vetNewPassword').value;
+    const confirmPassword = document.getElementById('vetConfirmPassword').value;
+    
+    if (!newPassword || !confirmPassword) {
+        vetShowError('vetStep3Error', 'Please fill in all fields');
+        return;
+    }
+    
+    // Show loading
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Resetting...';
+    btn.disabled = true;
+    
+    // Send request
+    fetch('/vet/reset_password_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'new_password': newPassword,
+            'confirm_password': confirmPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            vetShowSuccess('vetStep3Success', data.message);
+            setTimeout(() => {
+                location.reload(); // Reload to show login form
+            }, 2000);
+        } else {
+            vetShowError('vetStep3Error', data.message);
+        }
+    })
+    .catch(error => {
+        vetShowError('vetStep3Error', 'An error occurred. Please try again.');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function vetResendOTP() {
+    const resendLink = document.getElementById('vetResendLink');
+    if (resendLink.classList.contains('disabled')) return;
+    
+    // Show loading
+    const originalText = resendLink.innerHTML;
+    resendLink.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    
+    fetch('/vet/resend_otp_modal', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            vetShowSuccess('vetStep2Success', data.message);
+            vetStartResendTimer();
+        } else {
+            vetShowError('vetStep2Error', data.message);
+        }
+    })
+    .catch(error => {
+        vetShowError('vetStep2Error', 'Failed to resend OTP');
+    })
+    .finally(() => {
+        resendLink.innerHTML = originalText;
+    });
+}
+
+function vetStartResendTimer() {
+    clearInterval(vetOtpTimer);
+    vetResendTimeout = 60;
+    const resendLink = document.getElementById('vetResendLink');
+    const timerDisplay = document.getElementById('vetTimer');
+    
+    resendLink.classList.add('disabled');
+    resendLink.style.pointerEvents = 'none';
+    resendLink.style.opacity = '0.5';
+    
+    vetOtpTimer = setInterval(() => {
+        timerDisplay.textContent = `Resend available in ${vetResendTimeout}s`;
+        vetResendTimeout--;
+        
+        if (vetResendTimeout < 0) {
+            clearInterval(vetOtpTimer);
+            timerDisplay.textContent = '';
+            resendLink.classList.remove('disabled');
+            resendLink.style.pointerEvents = 'auto';
+            resendLink.style.opacity = '1';
+        }
+    }, 1000);
+}
+
+function vetShowStep(step) {
+    document.getElementById('vetStep1').classList.add('d-none');
+    document.getElementById('vetStep2').classList.add('d-none');
+    document.getElementById('vetStep3').classList.add('d-none');
+    
+    document.getElementById('vetStep1Error').classList.add('d-none');
+    document.getElementById('vetStep2Error').classList.add('d-none');
+    document.getElementById('vetStep3Error').classList.add('d-none');
+    
+    document.getElementById('vetStep1Success').classList.add('d-none');
+    document.getElementById('vetStep2Success').classList.add('d-none');
+    document.getElementById('vetStep3Success').classList.add('d-none');
+    
+    document.getElementById(`vetStep${step}`).classList.remove('d-none');
+}
+
+function vetBackToStep1() {
+    vetShowStep(1);
+}
+
+function vetBackToStep2() {
+    vetShowStep(2);
+}
+
+function vetShowError(elementId, message) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.classList.remove('d-none');
+}
+
+function vetShowSuccess(elementId, message) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.classList.remove('d-none');
+}
+
+// Reset modal when closed
+document.getElementById('vetForgotPasswordModal').addEventListener('hidden.bs.modal', function () {
+    vetShowStep(1);
+    document.getElementById('vetResetPhone').value = '';
+    document.getElementById('vetOtpInput').value = '';
+    document.getElementById('vetNewPassword').value = '';
+    document.getElementById('vetConfirmPassword').value = '';
+    clearInterval(vetOtpTimer);
+    document.getElementById('vetTimer').textContent = '';
+    sessionStorage.removeItem('vet_reset_phone');
+});
+
 </script>
 </body>
 </html>
