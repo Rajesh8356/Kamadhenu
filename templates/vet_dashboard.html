@@ -22,8 +22,8 @@
             background-color: #f8f9fa;
             color: #333;
         }
-        
-        .sidebar {
+  
+                .sidebar {
             background: linear-gradient(to bottom, var(--primary-green), var(--pastoral-green));
             color: white;
             height: 100vh;
@@ -35,7 +35,125 @@
             box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
         }
-        
+        /* ============================================
+   LANGUAGE TRANSLATION STYLES - COMPLETELY HIDDEN
+   ============================================ */
+
+/* Hide ALL Google Translate elements completely */
+.goog-te-banner-frame,
+.goog-te-banner,
+.goog-te-banner-wrapper,
+.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight,
+.goog-te-gadget,
+.goog-te-gadget-simple,
+.goog-te-combo,
+.goog-te-menu-value,
+.goog-te-menu-frame,
+.goog-te-menu2,
+.goog-te-spinner-pos,
+#google_translate_element,
+.goog-te-banner-frame.skiptranslate,
+body > .skiptranslate,
+.goog-te-gadget-icon,
+.goog-te-menu-value img {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    pointer-events: none !important;
+}
+
+/* Hide iframes */
+iframe.goog-te-banner-frame,
+iframe.goog-te-menu-frame {
+    display: none !important;
+    border: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+}
+
+/* Fix body positioning - prevent Google Translate from shifting the page */
+body {
+    top: 0px !important;
+    position: static !important;
+    transform: none !important;
+}
+
+/* Language Selector - Our custom buttons only */
+.language-selector {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    gap: 10px;
+    border: 2px solid var(--primary-green);
+}
+
+.lang-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.lang-btn.english {
+    background: var(--primary-green);
+    color: white;
+}
+
+.lang-btn.kannada {
+    background: var(--pastoral-green);
+    color: white;
+}
+
+.lang-btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+}
+
+.lang-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Mobile responsive for language selector */
+@media (max-width: 768px) {
+    .language-selector {
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 10px;
+    }
+    
+    .lang-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
         .sidebar-brand {
             padding: 1rem 1.5rem;
             font-size: 1.2rem;
@@ -222,91 +340,132 @@
                 margin-left: 70px;
             }
         }
-         /* Language Selector Styles - BOTTOM */
-    .language-selector {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 10000;
-        background: white;
-        padding: 10px 15px;
-        border-radius: 25px;
-        box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-        display: flex;
-        gap: 10px;
-        border: 2px solid #27ae60;
-    }
+          /* ============================================
+   LANGUAGE TRANSLATION STYLES FOR VET DASHBOARD
+   ============================================ */
 
-    .lang-btn {
-        padding: 8px 20px;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .lang-btn.english {
-        background: #007bff;
-        color: white;
-    }
-
-    .lang-btn.kannada {
-        background: #ff9800;
-        color: white;
-    }
-
-    .lang-btn.active {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
-    }
-
-    /* Hide Google banner */
-    .goog-te-banner-frame { display: none !important; }
-    body { top: 0 !important; }
-
-    /* Mobile responsive */
-    @media (max-width: 768px) {
+        /* Language Selector */
         .language-selector {
-            bottom: 10px;
-            right: 10px;
-            padding: 6px 10px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 10px;
+            border: 2px solid var(--primary-green);
         }
-        
+
         .lang-btn {
-            padding: 5px 10px;
-            font-size: 12px;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
         }
-    }
-    /* Completely hide ALL Google Translate elements */
-    .goog-te-banner-frame,
-    .goog-te-banner,
-    .goog-te-banner-wrapper,
-    .skiptranslate,
-    #goog-gt-tt,
-    .goog-te-balloon-frame,
-    .goog-tooltip,
-    .goog-tooltip:hover,
-    .goog-text-highlight {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        width: 0 !important;
-        position: absolute !important;
-    }
-    
-    /* Prevent body shift */
-    body {
-        top: 0px !important;
-        position: static !important;
-    }
-    
-    /* Hide the translation menu if it appears */
-    .goog-te-menu-frame {
-        display: none !important;
-    }
+
+        .lang-btn.english {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .lang-btn.kannada {
+            background: var(--pastoral-green);
+            color: white;
+        }
+
+        .lang-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Google Translate Widget Styling */
+        #google_translate_element {
+            position: fixed !important;
+            top: 70px !important;
+            right: 20px !important;
+            z-index: 9999 !important;
+            background: white !important;
+            padding: 5px 10px !important;
+            border-radius: 5px !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+            display: block !important;
+            border: 1px solid var(--primary-green) !important;
+        }
+
+        .goog-te-gadget {
+            font-size: 12px !important;
+        }
+
+        .goog-te-gadget-simple {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .goog-te-menu-value span {
+            color: var(--primary-green) !important;
+            font-weight: bold !important;
+        }
+
+        /* Hide Google Translate UI elements */
+        .goog-te-banner-frame,
+        .goog-te-banner,
+        .goog-te-banner-wrapper,
+        .skiptranslate,
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-tooltip,
+        .goog-tooltip:hover,
+        .goog-text-highlight {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+            position: absolute !important;
+        }
+
+        /* Prevent body shift */
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+
+        /* Hide the translation menu if it appears */
+        .goog-te-menu-frame {
+            display: none !important;
+        }
+
+        /* Mobile responsive for language selector */
+        @media (max-width: 768px) {
+            .language-selector {
+                bottom: 10px;
+                right: 10px;
+                padding: 6px 10px;
+            }
+            
+            .lang-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            
+            #google_translate_element {
+                bottom: 70px !important;
+                right: 10px !important;
+                padding: 4px 8px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -439,95 +598,309 @@
     </div>
 </div>
 
-      
+      <!-- Add this right before your existing language script -->
+<!-- Language Selector -->
+<div class="language-selector">
+    <button class="lang-btn english active" onclick="setLanguage('en')">
+        <i class="fas fa-globe-americas"></i> English
+    </button>
+    <button class="lang-btn kannada" onclick="setLanguage('kn')">
+        <i class="fas fa-globe-asia"></i> ಕನ್ನಡ
+    </button>
+</div>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none;"></div>
 
       
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    // Language translation functions
-    function googleTranslateElementInit() {
-        if (typeof google !== 'undefined' && google.translate) {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,kn',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
-            
-            const savedLang = localStorage.getItem('selectedLanguage');
-            if(savedLang === 'kn') {
-                setTimeout(() => applyKannada(), 1000);
-            }
-        }
-    }
-
-    window.onload = function() {
-        if (typeof google !== 'undefined' && google.translate) {
-            googleTranslateElementInit();
-        } else {
-            var script = document.createElement('script');
-            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-            document.body.appendChild(script);
-        }
-        
-        const savedLang = localStorage.getItem('selectedLanguage');
-        if(savedLang === 'kn') {
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.lang-btn.kannada').classList.add('active');
-            setTimeout(() => applyKannada(), 2000);
-        }
-    };
-
-    function applyKannada() {
-        var iframe = document.querySelector('.goog-te-menu-frame');
-        if(iframe && iframe.contentDocument) {
-            var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
-            if(select) {
-                select.value = 'kn';
-                select.dispatchEvent(new Event('change'));
-                return true;
-            }
-        }
-        
-        var elements = document.querySelectorAll('.goog-te-menu2-select');
-        if(elements.length > 0) {
-            elements[0].value = 'kn';
-            elements[0].dispatchEvent(new Event('change'));
-            return true;
-        }
-        
-        return false;
-    }
-
-    function setLanguage(lang) {
-        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+   <script>
+    // ============================================
+    // LANGUAGE MANAGEMENT SYSTEM FOR VET DASHBOARD
+    // ============================================
+    
+    // 1. Function to save language preference
+    function saveLanguagePreference(lang) {
         localStorage.setItem('selectedLanguage', lang);
-        
-        if(lang === 'kn') {
-            window.location.hash = '#googtrans(kn)';
-            if(applyKannada()) {
-                console.log('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
-            } else {
-                setTimeout(() => location.reload(), 500);
-            }
-        } else {
-            window.location.hash = '#googtrans(en)';
-            var iframe = document.querySelector('.goog-te-menu-frame');
-            if(iframe && iframe.contentDocument) {
-                var select = iframe.contentDocument.querySelector('.goog-te-menu2-select');
-                if(select) {
-                    select.value = 'en';
-                    select.dispatchEvent(new Event('change'));
-                    console.log('Language changed to English');
-                    return;
+        document.cookie = `user_language=${lang}; path=/; max-age=31536000`;
+        sessionStorage.setItem('selectedLanguage', lang);
+    }
+    
+    // 2. Function to apply language translation
+    function applyLanguage(lang) {
+        if (lang === 'kn') {
+            // Kannada translation
+            window.location.hash = '#googtrans(kn|en)';
+            
+            // Force Google Translate to apply
+            setTimeout(function() {
+                if (window.google && google.translate && google.translate.TranslateElement) {
+                    try {
+                        // This triggers the translation
+                        var select = document.querySelector('.goog-te-combo');
+                        if (select) {
+                            select.value = 'kn';
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    } catch(e) {
+                        console.log('Kannada translation applied');
+                    }
                 }
-            }
-            setTimeout(() => location.reload(), 500);
+            }, 500);
+        } else {
+            // English (default)
+            window.location.hash = '#googtrans(en)';
+            
+            setTimeout(function() {
+                if (window.google && google.translate && google.translate.TranslateElement) {
+                    try {
+                        var select = document.querySelector('.goog-te-combo');
+                        if (select) {
+                            select.value = 'en';
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    } catch(e) {
+                        console.log('English translation applied');
+                    }
+                }
+            }, 500);
         }
     }
+    
+    // 3. Main language switching function
+    function setLanguage(lang) {
+        // Update button UI
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Save the preference
+        saveLanguagePreference(lang);
+        
+        // Apply immediately
+        applyLanguage(lang);
+        
+        // Show confirmation
+        if (lang === 'kn') {
+            alert('ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ');
+        } else {
+            alert('Language changed to English');
+        }
+    }
+    
+    // 4. Initialize Google Translate
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,kn',
+            layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+            autoDisplay: false,
+            disableAutoTranslation: false
+        }, 'google_translate_element');
+        
+        // Hide the Google Translate widget immediately
+        setTimeout(function() {
+            // Hide all Google Translate elements
+            var elements = document.querySelectorAll('.goog-te-banner, .skiptranslate, .goog-te-gadget');
+            elements.forEach(function(el) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.height = '0';
+                el.style.overflow = 'hidden';
+            });
+            
+            // Fix body position
+            document.body.style.top = '0';
+        }, 100);
+    }
+    
+    // 5. Load Google Translate script
+    function loadGoogleTranslate() {
+        // Check if already loaded
+        if (window.google && google.translate) {
+            googleTranslateElementInit();
+            return;
+        }
+        
+        // Load the script
+        var script = document.createElement('script');
+        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        script.type = 'text/javascript';
+        document.head.appendChild(script);
+    }
+    
+    // ============================================
+    // ADDITIONAL DASHBOARD FUNCTIONALITY
+    // ============================================
+    
+    // Function to animate stat cards on scroll
+    function animateStatCards() {
+        const statCards = document.querySelectorAll('.stat-card');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.style.transition = 'all 0.5s ease';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        statCards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            observer.observe(card);
+        });
+    }
+    
+    // Function to update appointment status
+    function updateAppointmentStatus(appointmentId, status) {
+        // This would typically make an API call to update the appointment status
+        fetch('/update-appointment-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                appointment_id: appointmentId,
+                status: status
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Appointment status updated successfully!');
+                // Refresh the page or update the specific row
+                location.reload();
+            } else {
+                alert('Failed to update appointment status: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating appointment status. Please try again.');
+        });
+    }
+    
+    // Function to filter appointments by date
+    function filterAppointments(date) {
+        const rows = document.querySelectorAll('.recent-table tbody tr');
+        rows.forEach(row => {
+            const dateCell = row.cells[2]; // Assuming date is in the 3rd column
+            if (dateCell && dateCell.textContent.includes(date)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // ============================================
+    // MAIN INITIALIZATION
+    // ============================================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load Google Translate
+        loadGoogleTranslate();
+        
+        // Check for saved language preference
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        
+        // Set active button
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if ((savedLang === 'en' && btn.classList.contains('english')) || 
+                (savedLang === 'kn' && btn.classList.contains('kannada'))) {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Apply saved language after a short delay
+        setTimeout(function() {
+            applyLanguage(savedLang);
+        }, 1000);
+        
+        // Add language parameter to all links
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !href.includes('#') && href !== '#' && !href.includes('javascript:')) {
+                const lang = localStorage.getItem('selectedLanguage') || 'en';
+                const separator = href.includes('?') ? '&' : '?';
+                link.href = href + separator + 'lang=' + lang;
+            }
+        });
+        
+        // Animate stat cards on page load
+        animateStatCards();
+        
+        // Add click handlers for appointment status badges
+        document.querySelectorAll('.badge').forEach(badge => {
+            badge.addEventListener('click', function() {
+                if (this.classList.contains('bg-success')) {
+                    const appointmentId = this.getAttribute('data-appointment-id');
+                    if (appointmentId) {
+                        if (confirm('Mark this appointment as pending?')) {
+                            updateAppointmentStatus(appointmentId, 'pending');
+                        }
+                    }
+                } else if (this.classList.contains('bg-warning')) {
+                    const appointmentId = this.getAttribute('data-appointment-id');
+                    if (appointmentId) {
+                        if (confirm('Mark this appointment as completed?')) {
+                            updateAppointmentStatus(appointmentId, 'completed');
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Add today's date filter button functionality
+        const today = new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit' 
+        });
+        
+        // Create a filter button (you can add this to your HTML if needed)
+        const filterButton = document.createElement('button');
+        filterButton.className = 'btn btn-sm btn-outline-primary me-2';
+        filterButton.innerHTML = '<i class="fas fa-filter me-1"></i>Today\'s Appointments';
+        filterButton.addEventListener('click', function() {
+            filterAppointments(today);
+        });
+        
+        // Add clear filter button
+        const clearFilterButton = document.createElement('button');
+        clearFilterButton.className = 'btn btn-sm btn-outline-secondary';
+        clearFilterButton.innerHTML = '<i class="fas fa-times me-1"></i>Clear Filter';
+        clearFilterButton.addEventListener('click', function() {
+            const rows = document.querySelectorAll('.recent-table tbody tr');
+            rows.forEach(row => {
+                row.style.display = '';
+            });
+        });
+        
+        // Add buttons to the appointments card header if it exists
+        const appointmentsHeader = document.querySelector('.card-header');
+        if (appointmentsHeader) {
+            appointmentsHeader.appendChild(filterButton);
+            appointmentsHeader.appendChild(clearFilterButton);
+        }
+        
+        // Auto-refresh appointments every 5 minutes
+        setInterval(function() {
+            // Check if we're on the dashboard page and appointments exist
+            if (window.location.pathname.includes('/vet/dashboard') && 
+                document.querySelector('.recent-table tbody')) {
+                console.log('Auto-refreshing appointments data...');
+                // You can implement auto-refresh logic here
+                // For example: location.reload(); or fetch new data via AJAX
+            }
+        }, 300000); // 5 minutes
+    });
 </script>
 </body>
 </html>
