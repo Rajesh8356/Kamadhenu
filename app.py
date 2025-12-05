@@ -2751,8 +2751,11 @@ def cow_details(cow_id):
     conn = get_db()
     cursor = conn.cursor()
     
-    # Get cow details
-    cursor.execute("SELECT * FROM cows WHERE cow_id=?", (cow_id,))
+    # Clean the cow_id to handle any whitespace or case issues
+    cleaned_cow_id = cow_id.strip()
+    
+    # Get cow details - try case-insensitive search first
+    cursor.execute("SELECT * FROM cows WHERE UPPER(cow_id) = UPPER(?)", (cleaned_cow_id,))
     cow = cursor.fetchone()
     
     if cow:
@@ -2760,7 +2763,9 @@ def cow_details(cow_id):
         cursor.execute("SELECT * FROM farmers WHERE farmer_id=?", (cow["farmer_id"],))
         farmer = cursor.fetchone()
         
-        qr_path = f"/static/qrcodes/{cow_id}.png"
+        # Use the actual cow_id from database for QR path
+        actual_cow_id = cow["cow_id"]
+        qr_path = f"/static/qrcodes/{actual_cow_id}.png"
         
         conn.close()
         
@@ -4456,6 +4461,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
