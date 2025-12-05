@@ -63,7 +63,21 @@ if not os.path.exists(QR_FOLDER):
     os.makedirs(QR_FOLDER)
 
 
-
+def get_base_url():
+    """Get the base URL dynamically for QR codes"""
+    if 'RENDER' in os.environ:
+        # Running on Render
+        render_external_url = os.environ.get('RENDER_EXTERNAL_URL')
+        if render_external_url:
+            return render_external_url.rstrip('/')
+    
+    # Fallback to request host
+    from flask import request
+    if request and hasattr(request, 'host_url'):
+        return request.host_url.rstrip('/')
+    
+    # Default fallback
+    return "https://kamadhenu-zdm2.onrender.com"
 # ================= YOLO MODEL LAZY LOADING ==================
 import torch
 
@@ -2107,7 +2121,7 @@ def add_cow():
         conn.close()
 
         # Generate QR Code
-        qr_data = f"https://kamadhenu-zdm2.onrender.com/cow/{cow_id}"
+        qr_data = f"{get_base_url()}/cow/{cow_id}"
         qr_img = qrcode.make(qr_data)
         qr_path = os.path.join(QR_FOLDER, f"{cow_id}.png")
         qr_img.save(qr_path)
@@ -3010,7 +3024,7 @@ def purchase_cow(sale_id):
                         buyer_photo_filename))  # Buyer gets original photo
 
         # Generate QR Code for the purchased cow
-        qr_data = f"http://127.0.0.1:5000/cow/{new_cow_id}"
+        qr_data = f"{get_base_url()}/cow/{new_cow_id}"
         qr_img = qrcode.make(qr_data)
         qr_path = os.path.join(QR_FOLDER, f"{new_cow_id}.png")
         qr_img.save(qr_path)
@@ -4442,6 +4456,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
