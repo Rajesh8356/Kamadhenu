@@ -760,32 +760,41 @@
     }
 
     // Function to toggle fields based on cattle type
-    function toggleFields() {
-      const cattleType = document.getElementById('cattleType').value;
-      const milkYieldField = document.getElementById('milkYieldField');
-      const milkYieldInput = document.getElementById('milkYieldInput');
-      const parentFields = document.getElementById('parentFields');
-      
-      // Show/hide milk yield field
-      if (cattleType === 'cow' || cattleType === 'buffalo') {
-        milkYieldField.style.display = 'block';
-        milkYieldInput.required = true;
-      } else {
-        milkYieldField.style.display = 'none';
-        milkYieldInput.required = false;
-        milkYieldInput.value = '';
-      }
-      
-      // Show/hide parent fields for calves
-      if (cattleType === 'calf') {
-        parentFields.style.display = 'block';
-      } else {
-        parentFields.style.display = 'none';
-      }
-      
-      // Filter breeds based on cattle type
-      filterBreeds(cattleType);
-    }
+    // Function to toggle fields based on cattle type
+function toggleFields() {
+  const cattleType = document.getElementById('cattleType').value;
+  const milkYieldField = document.getElementById('milkYieldField');
+  const milkYieldInput = document.getElementById('milkYieldInput');
+  const parentFields = document.getElementById('parentFields');
+  
+  // Define which types should show milk yield field
+  const showMilkYieldTypes = ['cow', 'buffalo'];
+  
+  // Show/hide milk yield field
+  if (showMilkYieldTypes.includes(cattleType)) {
+    milkYieldField.style.display = 'block';
+    milkYieldInput.required = true;
+  } else if (cattleType === 'other') {
+    // For "other" type, show but don't require initially
+    milkYieldField.style.display = 'block';
+    milkYieldInput.required = false;
+  } else {
+    // For bull, male_buffalo, calf - hide milk yield
+    milkYieldField.style.display = 'none';
+    milkYieldInput.required = false;
+    milkYieldInput.value = '';
+  }
+  
+  // Show/hide parent fields for calves
+  if (cattleType === 'calf') {
+    parentFields.style.display = 'block';
+  } else {
+    parentFields.style.display = 'none';
+  }
+  
+  // Filter breeds based on cattle type
+  filterBreeds(cattleType);
+}
 
     // Function to filter breeds based on selected cattle type
     function filterBreeds(cattleType) {
@@ -871,78 +880,127 @@
     }
 
     // MAIN FORM SUBMISSION HANDLER
-    document.getElementById('cowForm').addEventListener('submit', function(e) {
-      const cattleTypeSelect = document.getElementById('cattleType');
-      const cattleTypeOtherInput = document.getElementById('cattleTypeOtherInput');
-      const breedSelect = document.getElementById('breedSelect');
-      const breedOtherInput = document.getElementById('breedOtherInput');
-      const dateOfBirth = document.getElementById('dateOfBirth').value;
-      const age = document.getElementById('ageField').value;
-      const weight = document.querySelector('input[name="weight"]').value;
-      
-      // Prepare values for submission
-      let finalCattleType = cattleTypeSelect.value;
-      let finalBreed = breedSelect.value;
-      
-      // If "Other" is selected, use textbox value
-      if (finalCattleType === 'other' && cattleTypeOtherInput.value.trim()) {
-        finalCattleType = cattleTypeOtherInput.value.trim();
-      }
-      
-      if (finalBreed === 'other' && breedOtherInput.value.trim()) {
-        finalBreed = breedOtherInput.value.trim();
-      }
-      
-      // Update the form values before submission (so backend gets correct values)
-      if (cattleTypeSelect.value === 'other' && cattleTypeOtherInput.value.trim()) {
-        // Create a hidden input with the custom value
-        const hiddenCattleType = document.createElement('input');
-        hiddenCattleType.type = 'hidden';
-        hiddenCattleType.name = 'cattle_type';
-        hiddenCattleType.value = finalCattleType;
-        this.appendChild(hiddenCattleType);
-      }
-      
-      if (breedSelect.value === 'other' && breedOtherInput.value.trim()) {
-        // Create a hidden input with the custom value
-        const hiddenBreed = document.createElement('input');
-        hiddenBreed.type = 'hidden';
-        hiddenBreed.name = 'breed';
-        hiddenBreed.value = finalBreed;
-        this.appendChild(hiddenBreed);
-      }
-      
-      // Validate fields
-      if (!finalCattleType || finalCattleType === 'other') {
+    // MAIN FORM SUBMISSION HANDLER
+document.getElementById('cowForm').addEventListener('submit', function(e) {
+  const cattleTypeSelect = document.getElementById('cattleType');
+  const cattleTypeOtherInput = document.getElementById('cattleTypeOtherInput');
+  const breedSelect = document.getElementById('breedSelect');
+  const breedOtherInput = document.getElementById('breedOtherInput');
+  const dateOfBirth = document.getElementById('dateOfBirth').value;
+  const age = document.getElementById('ageField').value;
+  const weight = document.querySelector('input[name="weight"]').value;
+  const milkYieldInput = document.getElementById('milkYieldInput');
+  const milkYieldValue = milkYieldInput ? milkYieldInput.value : '';
+  
+  // Prepare values for submission
+  let finalCattleType = cattleTypeSelect.value;
+  let finalBreed = breedSelect.value;
+  
+  // If "Other" is selected, use textbox value
+  if (finalCattleType === 'other' && cattleTypeOtherInput.value.trim()) {
+    finalCattleType = cattleTypeOtherInput.value.trim().toLowerCase();
+  } else {
+    finalCattleType = finalCattleType.toLowerCase();
+  }
+  
+  if (finalBreed === 'other' && breedOtherInput.value.trim()) {
+    finalBreed = breedOtherInput.value.trim();
+  }
+  
+  // Update the form values before submission (so backend gets correct values)
+  if (cattleTypeSelect.value === 'other' && cattleTypeOtherInput.value.trim()) {
+    // Create a hidden input with the custom value
+    const hiddenCattleType = document.createElement('input');
+    hiddenCattleType.type = 'hidden';
+    hiddenCattleType.name = 'cattle_type';
+    hiddenCattleType.value = finalCattleType;
+    this.appendChild(hiddenCattleType);
+  }
+  
+  if (breedSelect.value === 'other' && breedOtherInput.value.trim()) {
+    // Create a hidden input with the custom value
+    const hiddenBreed = document.createElement('input');
+    hiddenBreed.type = 'hidden';
+    hiddenBreed.name = 'breed';
+    hiddenBreed.value = finalBreed;
+    this.appendChild(hiddenBreed);
+  }
+  
+  // Validate fields
+  if (!finalCattleType || finalCattleType === 'other') {
+    e.preventDefault();
+    alert('Please select or specify Cattle Type');
+    return false;
+  }
+  
+  if (!finalBreed || finalBreed === 'other') {
+    e.preventDefault();
+    alert('Please select or specify Breed');
+    return false;
+  }
+  
+  if (!dateOfBirth || !age || !weight) {
+    e.preventDefault();
+    alert('Please fill in all required fields: Date of Birth, and Weight');
+    return false;
+  }
+  
+  // MILK YIELD VALIDATION FOR ALL 6 TYPES:
+  // 1. cow - REQUIRES milk yield
+  // 2. bull - NO milk yield
+  // 3. buffalo - REQUIRES milk yield
+  // 4. male_buffalo - NO milk yield
+  // 5. calf - NO milk yield
+  // 6. other - MAY require milk yield (ask user)
+  
+  const originalCattleType = cattleTypeSelect.value; // Get the original selection
+  
+  // For non-milk-producing types, ensure milk yield is empty
+  const nonMilkProducingTypes = ['bull', 'male_buffalo', 'calf'];
+  if (nonMilkProducingTypes.includes(originalCattleType) && milkYieldValue) {
+    e.preventDefault();
+    alert(`${cattleTypeSelect.options[cattleTypeSelect.selectedIndex].text} does not produce milk. Please remove milk yield value.`);
+    return false;
+  }
+  
+  // For milk-producing types, require milk yield
+  const milkProducingTypes = ['cow', 'buffalo'];
+  if (milkProducingTypes.includes(originalCattleType) && !milkYieldValue) {
+    e.preventDefault();
+    alert('Milk Yield is required for milk-producing cattle (Cows and Female Buffalo)');
+    return false;
+  }
+  
+  // For "other" type, check if it's milk-producing
+  if (originalCattleType === 'other' && cattleTypeOtherInput.value.trim()) {
+    const otherType = cattleTypeOtherInput.value.trim().toLowerCase();
+    
+    // Check if the "other" type is likely milk-producing
+    const milkKeywords = ['cow', 'buffalo', 'dairy', 'milch', 'milk', 'female'];
+    const nonMilkKeywords = ['bull', 'male', 'calf', 'steer', 'ox', 'bullock'];
+    
+    const hasMilkKeyword = milkKeywords.some(keyword => otherType.includes(keyword));
+    const hasNonMilkKeyword = nonMilkKeywords.some(keyword => otherType.includes(keyword));
+    
+    if (hasMilkKeyword && !hasNonMilkKeyword && !milkYieldValue) {
+      // Likely milk-producing, ask for confirmation
+      const confirmMsg = `You entered "${otherType}". Is this a milk-producing animal?`;
+      if (confirm(confirmMsg) && !milkYieldValue) {
         e.preventDefault();
-        alert('Please select or specify Cattle Type');
+        alert(`Please enter milk yield for ${otherType}`);
         return false;
       }
-      
-      if (!finalBreed || finalBreed === 'other') {
-        e.preventDefault();
-        alert('Please select or specify Breed');
-        return false;
-      }
-      
-      if (!dateOfBirth || !age || !weight) {
-        e.preventDefault();
-        alert('Please fill in all required fields: Date of Birth, and Weight');
-        return false;
-      }
-      
-      // Validate milk yield for milk-producing cattle
-      const lowerCattleType = finalCattleType.toLowerCase();
-      if ((lowerCattleType.includes('cow') || lowerCattleType.includes('buffalo') || 
-           lowerCattleType.includes('dairy') || lowerCattleType === 'cow' || 
-           lowerCattleType === 'buffalo') && !document.getElementById('milkYieldInput').value) {
-        e.preventDefault();
-        alert('Milk Yield is required for milk-producing cattle');
-        return false;
-      }
-      
-      return true;
-    });
+    } else if (hasNonMilkKeyword && milkYieldValue) {
+      // Likely non-milk-producing but has milk yield
+      e.preventDefault();
+      alert(`${otherType} does not produce milk. Please remove milk yield value.`);
+      return false;
+    }
+    // For ambiguous cases, don't validate
+  }
+  
+  return true;
+});
 
     // Event listeners on page load
     document.addEventListener('DOMContentLoaded', function() {
