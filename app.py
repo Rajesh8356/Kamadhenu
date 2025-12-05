@@ -2040,7 +2040,6 @@ def update_profile():
     finally:
         conn.close()
 # ---------------- Add Cow (with Photo) ----------------
-# ---------------- Add Cow (with Photo) ----------------
 @app.route("/add_cow", methods=["GET", "POST"])
 def add_cow():
     if "farmer_id" not in session:
@@ -2058,22 +2057,85 @@ def add_cow():
     existing_cows = cursor.fetchall()
 
     if request.method == "POST":
+        # Handle cattle type (regular or "other" with custom input)
+        cattle_type = request.form["cattle_type"]
+        if cattle_type == 'other' and 'cattle_type_other' in request.form:
+            cattle_type = request.form['cattle_type_other'].strip().lower()
+        
+        # Handle breed (regular or "other" with custom input)
+        breed = request.form["breed"]
+        if breed == 'other' and 'breed_other' in request.form:
+            breed = request.form['breed_other'].strip()
+        
+        # Validate milk yield based on cattle type
+        milk_yield = None
+        cattle_type_lower = cattle_type.lower()
+        
+        # Define cattle type categories
+        milk_producing_types = ['cow', 'buffalo']
+        non_milk_producing_types = ['bull', 'male_buffalo', 'calf']
+        
+        # For milk-producing types: require milk yield
+        if cattle_type_lower in milk_producing_types:
+            milk_yield = request.form.get("milk_yield")
+            if not milk_yield:
+                flash('Milk Yield is required for milk-producing cattle (Cows and Female Buffalo)', 'error')
+                return render_template("add_cow.html",
+                                     pending_muzzle=session.get('pending_muzzle'),
+                                     breeds=breeds,
+                                     existing_cows=existing_cows)
+        
+        # For non-milk-producing types: ensure NO milk yield
+        elif cattle_type_lower in non_milk_producing_types:
+            milk_yield = None  # Explicitly set to None
+            if request.form.get("milk_yield"):
+                flash(f'{cattle_type.title()} does not produce milk. Milk yield should not be provided.', 'error')
+                return render_template("add_cow.html",
+                                     pending_muzzle=session.get('pending_muzzle'),
+                                     breeds=breeds,
+                                     existing_cows=existing_cows)
+        
+        # For "other" type (if user entered "other" in the textbox)
+        elif cattle_type_lower == 'other':
+            # Check if it's likely milk-producing
+            other_type_input = request.form.get('cattle_type_other', '').lower()
+            milk_keywords = ['cow', 'buffalo', 'dairy', 'milch', 'milk', 'female']
+            non_milk_keywords = ['bull', 'male', 'calf', 'steer', 'ox', 'bullock']
+            
+            has_milk_keyword = any(keyword in other_type_input for keyword in milk_keywords)
+            has_non_milk_keyword = any(keyword in other_type_input for keyword in non_milk_keywords)
+            
+            if has_milk_keyword and not has_non_milk_keyword:
+                # Likely milk-producing, require milk yield
+                milk_yield = request.form.get("milk_yield")
+                if not milk_yield:
+                    flash(f'{other_type_input.title()} appears to be milk-producing. Please enter milk yield.', 'error')
+                    return render_template("add_cow.html",
+                                         pending_muzzle=session.get('pending_muzzle'),
+                                         breeds=breeds,
+                                         existing_cows=existing_cows)
+            elif has_non_milk_keyword:
+                # Likely non-milk-producing, no milk yield
+                milk_yield = None
+                if request.form.get("milk_yield"):
+                    flash(f'{other_type_input.title()} does not produce milk. Please remove milk yield.', 'error')
+                    return render_template("add_cow.html",
+                                         pending_muzzle=session.get('pending_muzzle'),
+                                         breeds=breeds,
+                                         existing_cows=existing_cows)
+            else:
+                # Ambiguous case, accept if provided
+                milk_yield = request.form.get("milk_yield") or None
+        
+        # Generate cow ID
         cow_id = "COW-" + str(uuid.uuid4().hex[:6].upper())
         farmer_id = session["farmer_id"]
-        cattle_type = request.form["cattle_type"]
-        breed = request.form["breed"]
         date_of_birth = request.form["date_of_birth"]
         age = request.form["age"]
         weight = request.form["weight"]
         color = request.form["color"]
         health_records = request.form["health_records"]
         vaccination_history = request.form["vaccination_history"]
-        
-        # Conditionally get milk_yield based on cattle_type
-        milk_yield = None
-        if cattle_type in ['cow', 'buffalo']:
-            milk_yield = request.form.get("milk_yield")
-        
         special_notes = request.form["special_notes"]
         
         # Get insurance details
@@ -2084,7 +2146,7 @@ def add_cow():
         # Get parent IDs only for calves
         father_id = None
         mother_id = None
-        if cattle_type == 'calf':
+        if cattle_type_lower == 'calf':
             father_id = request.form.get("father_id") or None
             mother_id = request.form.get("mother_id") or None
 
@@ -2093,7 +2155,7 @@ def add_cow():
         if "photo" in request.files:
             file = request.files["photo"]
             if file.filename != "":
-                filename = f"{cow_id}_{file.filename}"
+                filename = f"{cow_id}_{secure_filename(file.filename)}"
                 filepath = os.path.join(app.config["COW_UPLOAD_FOLDER"], filename)
                 file.save(filepath)
                 photo = filename
@@ -2109,22 +2171,34 @@ def add_cow():
             session.pop('pending_muzzle')
 
         # Insert into DB with new fields
-        cursor.execute("""INSERT INTO cows 
-                          (cow_id, farmer_id, cattle_type, breed, date_of_birth, age, weight, color, health_records, 
-                           vaccination_history, milk_yield, special_notes, photo, muzzle_id, muzzle_photo,
-                           father_id, mother_id, insurance_by, insurance_policy_number, insurance_valid_upto) 
-                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                       (cow_id, farmer_id, cattle_type, breed, date_of_birth, age, weight, color, health_records,
-                        vaccination_history, milk_yield, special_notes, photo, muzzle_id, muzzle_photo,
-                        father_id, mother_id, insurance_by, insurance_policy_number, insurance_valid_upto))
-        conn.commit()
-        conn.close()
+        try:
+            cursor.execute("""INSERT INTO cows 
+                              (cow_id, farmer_id, cattle_type, breed, date_of_birth, age, weight, color, health_records, 
+                               vaccination_history, milk_yield, special_notes, photo, muzzle_id, muzzle_photo,
+                               father_id, mother_id, insurance_by, insurance_policy_number, insurance_valid_upto) 
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                           (cow_id, farmer_id, cattle_type, breed, date_of_birth, age, weight, color, health_records,
+                            vaccination_history, milk_yield, special_notes, photo, muzzle_id, muzzle_photo,
+                            father_id, mother_id, insurance_by, insurance_policy_number, insurance_valid_upto))
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            flash(f'Error saving cow profile: {str(e)}', 'error')
+            return render_template("add_cow.html",
+                                 pending_muzzle=session.get('pending_muzzle'),
+                                 breeds=breeds,
+                                 existing_cows=existing_cows)
+        finally:
+            conn.close()
 
         # Generate QR Code
-        qr_data = f"https://kamadhenu-zdm2.onrender.com/cow/{cow_id}"
-        qr_img = qrcode.make(qr_data)
-        qr_path = os.path.join(QR_FOLDER, f"{cow_id}.png")
-        qr_img.save(qr_path)
+        try:
+            qr_data = f"https://kamadhenu-zdm2.onrender.com/cow/{cow_id}"
+            qr_img = qrcode.make(qr_data)
+            qr_path = os.path.join(QR_FOLDER, f"{cow_id}.png")
+            qr_img.save(qr_path)
+        except Exception as e:
+            print(f"Error generating QR code: {e}")
 
         flash(f"Cow profile added successfully! Cattle Type: {cattle_type.title()}", "success")
         return redirect(url_for("list_cows"))
@@ -2138,7 +2212,6 @@ def add_cow():
                          pending_muzzle=pending_muzzle,
                          breeds=breeds,
                          existing_cows=existing_cows)
-
 
 @app.route("/capture_muzzle")
 def capture_muzzle():
@@ -4461,6 +4534,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
