@@ -2121,7 +2121,7 @@ def add_cow():
         conn.close()
 
         # Generate QR Code
-        qr_data = f"{get_base_url()}/cow/{cow_id}"
+        qr_data = f"https://kamadhenu-zdm2.onrender.com/cow/{cow_id}"
         qr_img = qrcode.make(qr_data)
         qr_path = os.path.join(QR_FOLDER, f"{cow_id}.png")
         qr_img.save(qr_path)
@@ -3024,7 +3024,7 @@ def purchase_cow(sale_id):
                         buyer_photo_filename))  # Buyer gets original photo
 
         # Generate QR Code for the purchased cow
-        qr_data = f"{get_base_url()}/cow/{new_cow_id}"
+        qr_data = f"https://kamadhenu-zdm2.onrender.com/cow/{new_cow_id}"
         qr_img = qrcode.make(qr_data)
         qr_path = os.path.join(QR_FOLDER, f"{new_cow_id}.png")
         qr_img.save(qr_path)
@@ -4456,6 +4456,7 @@ def admin_logout():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
 
 
 
